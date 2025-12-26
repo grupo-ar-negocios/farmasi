@@ -170,12 +170,11 @@ function App() {
 
   const handleImportProducts = async (newProducts: Product[]) => {
     try {
-      for (const p of newProducts) {
-        await supabaseService.createProduct(p);
-      }
+      await supabaseService.createProducts(newProducts);
       refreshData();
     } catch (e) {
-      console.error("Erro ao importar produtos", e);
+      console.error("Erro ao importar produtos:", e);
+      alert("Erro ao importar produtos. Verifique o console.");
     }
   };
 
@@ -199,10 +198,11 @@ function App() {
 
   const handleAddSale = async (sale: Sale) => {
     try {
+      // 1. Criar a venda e itens
       await supabaseService.createSale(sale);
 
-      // Update stock quantities for each item
-      for (const item of sale.items) {
+      // 2. Atualizar estoque (Ideal seria em lote ou trigger no banco)
+      const updates = sale.items.map(async (item) => {
         const product = products.find(p => p.id === item.productId);
         if (product) {
           const updatedProduct = { ...product };
@@ -211,13 +211,15 @@ function App() {
           } else if (sale.type === 'consignment' && sale.originSalonId) {
             updatedProduct.consignedQuantity -= item.quantity;
           }
-          await supabaseService.updateProduct(updatedProduct);
+          return supabaseService.updateProduct(updatedProduct);
         }
-      }
+      });
 
+      await Promise.all(updates);
       refreshData();
     } catch (e) {
-      console.error("Erro ao adicionar venda", e);
+      console.error("Erro ao adicionar venda:", e);
+      alert("Não foi possível salvar a venda. Verifique sua conexão ou dados.");
     }
   };
 

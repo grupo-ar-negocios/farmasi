@@ -115,7 +115,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
     const saleData: Sale = {
       id: editingSale ? editingSale.id : Date.now().toString(),
       date: editingSale ? editingSale.date : new Date().toISOString(),
-      clientId: selectedClientId || 'Anônimo',
+      clientId: selectedClientId || null,
       items: items,
       totalValue: calculateTotal(),
       totalCost: items.reduce((acc, item) => acc + (item.quantity * item.unitCost), 0),

@@ -31,8 +31,27 @@ export const supabaseService = {
             }])
             .select()
             .single();
-        if (error) throw error;
+        if (error) {
+            console.error("Erro ao criar produto:", error);
+            throw error;
+        }
         return data as Product;
+    },
+
+    createProducts: async (products: Omit<Product, 'id'>[]) => {
+        const toInsert = products.map(p => ({
+            code: p.code,
+            name: p.name,
+            cost_price: p.costPrice,
+            sell_price: p.sellPrice,
+            stock_quantity: p.stockQuantity,
+            consigned_quantity: p.consignedQuantity
+        }));
+        const { error } = await supabase.from('products').insert(toInsert);
+        if (error) {
+            console.error("Erro ao importar produtos em lote:", error);
+            throw error;
+        }
     },
 
     updateProduct: async (product: Product) => {
@@ -202,7 +221,10 @@ export const supabaseService = {
             .select()
             .single();
 
-        if (saleError) throw saleError;
+        if (saleError) {
+            console.error("Erro ao criar venda (sales table):", saleError);
+            throw saleError;
+        }
 
         const itemsToInsert = sale.items.map(item => ({
             sale_id: saleData.id,
