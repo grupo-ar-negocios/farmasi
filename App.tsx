@@ -179,6 +179,7 @@ function App() {
   };
 
   const handleAddProduct = async (prod: Omit<Product, 'id'>) => {
+    setAutoOpenModal(false);
     try {
       await supabaseService.createProduct(prod);
       refreshData();
@@ -197,6 +198,7 @@ function App() {
   };
 
   const handleAddSale = async (sale: Sale) => {
+    setAutoOpenModal(false);
     try {
       // 1. Criar a venda e itens
       await supabaseService.createSale(sale);
@@ -231,6 +233,7 @@ function App() {
   };
 
   const handleAddConsignment = async (consignment: Omit<Consignment, 'id'>) => {
+    setAutoOpenModal(false);
     try {
       await supabaseService.createConsignment(consignment);
 
@@ -250,6 +253,7 @@ function App() {
   };
 
   const handleAddSalon = async (salon: Omit<Salon, 'id'>) => {
+    setAutoOpenModal(false);
     try {
       await supabaseService.createSalon(salon);
       refreshData();
@@ -268,6 +272,7 @@ function App() {
   };
 
   const handleAddClient = async (client: Omit<Client, 'id'>) => {
+    setAutoOpenModal(false);
     try {
       await supabaseService.createClient(client);
       refreshData();
