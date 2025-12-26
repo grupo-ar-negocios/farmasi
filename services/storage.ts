@@ -64,9 +64,8 @@ export const storage = {
   },
   saveSales: (data: Sale[]) => localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(data)),
 
-  exportToExcel: () => {
+  exportToExcel: (products: Product[]) => {
     const wb = XLSX.utils.book_new();
-    const products = storage.getProducts();
     const wsProducts = XLSX.utils.json_to_sheet(products);
     XLSX.utils.book_append_sheet(wb, wsProducts, "Estoque");
     XLSX.writeFile(wb, `StudioLuzi_Backup_${new Date().toISOString().slice(0, 10)}.xlsx`);

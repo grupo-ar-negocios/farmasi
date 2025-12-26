@@ -166,7 +166,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
             >
               <Upload size={18} /> Importar Estoque
             </button>
-            <button onClick={() => storage.exportToExcel()} className="flex items-center gap-3 bg-slate-950 text-white px-8 py-4 rounded-2xl hover:bg-black transition-all text-[11px] font-black uppercase tracking-widest shadow-xl">
+            <button onClick={() => storage.exportToExcel(products)} className="flex items-center gap-3 bg-slate-950 text-white px-8 py-4 rounded-2xl hover:bg-black transition-all text-[11px] font-black uppercase tracking-widest shadow-xl">
               <Download size={18} /> Backup
             </button>
           </div>
