@@ -27,6 +27,7 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [autoOpenModal, setAutoOpenModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -60,19 +61,31 @@ function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) checkApproval(session.user.id);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) checkApproval(session.user.id);
+      else setIsApproved(null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const checkApproval = async (userId: string) => {
+    const profile = await supabaseService.getProfile(userId);
+    if (profile) {
+      setIsApproved(profile.is_approved);
+    } else {
+      setIsApproved(false);
+    }
+  };
+
   useEffect(() => {
-    if (session) {
+    if (session && isApproved) {
       refreshData();
 
       // Subscribe to real-time changes
@@ -109,7 +122,29 @@ function App() {
         supabase.removeChannel(channel);
       };
     }
-  }, [session, refreshData]);
+  }, [session, isApproved, refreshData]);
+
+  // Real-time approval listener
+  useEffect(() => {
+    if (session && isApproved === false) {
+      const channel = supabase
+        .channel('approval-check')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${session.user.id}` },
+          (payload) => {
+            if (payload.new && (payload.new as any).is_approved) {
+              setIsApproved(true);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [session, isApproved]);
 
   const handleViewChange = (view: ViewState) => {
     setCurrentView(view);
@@ -329,6 +364,40 @@ function App() {
 
   if (!session) {
     return <Auth />;
+  }
+
+  if (isApproved === false) {
+    return (
+      <div className="min-h-screen bg-[#fffafb] flex items-center justify-center p-4">
+        <div className="bg-white p-12 rounded-[3rem] shadow-xl border border-rose-100 text-center max-w-md animate-in fade-in zoom-in duration-500">
+          <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-8">
+            <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <h2 className="text-2xl font-black text-slate-950 uppercase tracking-tight mb-4">Acesso Pendente</h2>
+          <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8">
+            Seu cadastro foi recebido com sucesso! Por segurança, novos acessos precisam ser aprovados pelo administrador.
+          </p>
+          <div className="bg-[#fffafa] p-6 rounded-2xl border border-rose-50 mb-8">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status do Perfil</p>
+            <p className="text-rose-500 font-black uppercase text-xs">Aguardando Aprovação de @ar-negocios</p>
+          </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-rose-500 transition-colors"
+          >
+            Sair da Conta
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isApproved === null) {
+    return (
+      <div className="min-h-screen bg-[#fffafb] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div>
+      </div>
+    );
   }
 
   return <Layout currentView={currentView} onChangeView={handleViewChange}>{renderContent()}</Layout>;

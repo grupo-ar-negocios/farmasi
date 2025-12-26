@@ -244,5 +244,16 @@ export const supabaseService = {
     deleteSale: async (id: string) => {
         const { error } = await supabase.from('sales').delete().eq('id', id);
         if (error) throw error;
+    },
+
+    // Profiles
+    getProfile: async (id: string) => {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', id)
+            .single();
+        if (error) return null;
+        return data as { id: string; email: string; is_approved: boolean };
     }
 };

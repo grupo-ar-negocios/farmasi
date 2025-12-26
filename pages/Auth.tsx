@@ -18,7 +18,7 @@ export function Auth() {
             if (isSignUp) {
                 const { error } = await supabase.auth.signUp({ email, password });
                 if (error) throw error;
-                alert('Confirme seu e-mail para ativar sua conta!');
+                alert('Conta criada! Aguarde a aprovação do administrador para acessar o sistema.');
             } else {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
