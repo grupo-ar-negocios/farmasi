@@ -74,6 +74,40 @@ function App() {
   useEffect(() => {
     if (session) {
       refreshData();
+
+      // Subscribe to real-time changes
+      const channel = supabase
+        .channel('db-changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'products' },
+          () => refreshData()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'sales' },
+          () => refreshData()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'clients' },
+          () => refreshData()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'salons' },
+          () => refreshData()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'consignments' },
+          () => refreshData()
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [session, refreshData]);
 
