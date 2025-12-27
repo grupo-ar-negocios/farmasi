@@ -41,10 +41,14 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
       instagram: formData.instagram || ''
     };
 
+    console.log("Clients UI: handleSubmit - Dados do formulário:", clientData);
+
     if (editingClient) {
+      console.log("Clients UI: Modo edição, ID:", editingClient.id);
       clientData.id = editingClient.id;
       onEdit(clientData as Client);
     } else {
+      console.log("Clients UI: Modo criação");
       onAdd(clientData as Client);
     }
 

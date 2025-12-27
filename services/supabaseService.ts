@@ -82,6 +82,7 @@ export const supabaseService = {
     },
 
     createClient: async (client: Omit<Client, 'id'>) => {
+        console.log("SupabaseService: Criando cliente com dados:", client);
         const { data, error } = await supabase
             .from('clients')
             .insert([{
@@ -92,9 +93,10 @@ export const supabaseService = {
             .select()
             .single();
         if (error) {
-            console.error("Erro ao criar cliente:", error);
+            console.error("SupabaseService: Erro ao criar cliente:", error);
             throw error;
         }
+        console.log("SupabaseService: Cliente criado com sucesso:", data);
         return data as Client;
     },
 
