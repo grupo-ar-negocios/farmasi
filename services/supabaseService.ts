@@ -82,8 +82,19 @@ export const supabaseService = {
     },
 
     createClient: async (client: Omit<Client, 'id'>) => {
-        const { data, error } = await supabase.from('clients').insert([client]).select().single();
-        if (error) throw error;
+        const { data, error } = await supabase
+            .from('clients')
+            .insert([{
+                name: client.name,
+                phone: client.phone,
+                instagram: client.instagram
+            }])
+            .select()
+            .single();
+        if (error) {
+            console.error("Erro ao criar cliente:", error);
+            throw error;
+        }
         return data as Client;
     },
 
