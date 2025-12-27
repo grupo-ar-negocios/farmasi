@@ -153,11 +153,11 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
           <table className="w-full text-left">
             <thead className="bg-[#fcf8f9] text-slate-400 font-bold uppercase text-[10px] border-b border-slate-50 tracking-widest">
               <tr>
-                <th className="px-8 py-6">Timestamp</th>
-                <th className="px-8 py-6">Customer</th>
-                <th className="px-8 py-6">Channel</th>
-                <th className="px-8 py-6 text-right">Revenue</th>
-                <th className="px-8 py-6 text-center">Actions</th>
+                <th className="px-8 py-6">Data / Hora</th>
+                <th className="px-8 py-6">Cliente</th>
+                <th className="px-8 py-6">Canal</th>
+                <th className="px-8 py-6 text-right">Valor Total</th>
+                <th className="px-8 py-6 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -167,7 +167,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                   <td className="px-8 py-6 text-xs font-bold text-slate-900 uppercase tracking-tight">{clients.find(c => String(c.id) === String(sale.clientId))?.name || 'Balcão'}</td>
                   <td className="px-8 py-6">
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tight ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
-                      {sale.type === 'direct' ? 'Warehouse' : 'Salon Delivery'}
+                      {sale.type === 'direct' ? 'Estoque Central' : 'Entrega Salão'}
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right font-bold text-sm text-slate-950">R$ {sale.totalValue.toFixed(2)}</td>
@@ -192,31 +192,31 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
               <div className="flex gap-4">
                 <label className={`flex-1 flex items-center justify-center p-4 rounded-2xl border transition-all ${saleType === 'direct' ? 'border-[#800020] bg-[#800020] text-white shadow-md' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
                   <input type="radio" checked={saleType === 'direct'} onChange={() => { setSaleType('direct'); setSelectedProduct(null); }} className="hidden" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Inventory</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Estoque Direto</span>
                 </label>
                 <label className={`flex-1 flex items-center justify-center p-4 rounded-2xl border transition-all ${saleType === 'consignment' ? 'border-[#800020] bg-[#800020] text-white shadow-md' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
                   <input type="radio" checked={saleType === 'consignment'} onChange={() => { setSaleType('consignment'); setSelectedProduct(null); }} className="hidden" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Partnership</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Entrega Salão</span>
                 </label>
               </div>
               {saleType === 'consignment' && (
                 <select required className="w-full p-4 border border-slate-100 bg-slate-50 text-slate-900 font-bold text-[11px] uppercase rounded-2xl outline-none focus:bg-white focus:border-[#800020]/20 transition-all" value={originSalonId} onChange={e => { setOriginSalonId(e.target.value); setSelectedProduct(null); }}>
-                  <option value="">Select Partner Salon</option>
+                  <option value="">Selecione o Salão Parceiro</option>
                   {salons.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               )}
             </div>
             <div className="space-y-4">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Payment Info</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Informações de Pagamento</label>
               <select className="w-full p-4 border border-slate-100 bg-slate-50 text-slate-900 font-bold text-[11px] uppercase rounded-2xl outline-none focus:bg-white focus:border-[#800020]/20 transition-all" value={selectedClientId} onChange={e => setSelectedClientId(e.target.value)}>
-                <option value="">Individual (Guest checkout)</option>
+                <option value="">Venda Direta (Sem Cliente)</option>
                 {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
               <select className="w-full p-4 border border-slate-100 bg-slate-50 text-slate-900 font-bold text-[11px] uppercase rounded-2xl outline-none focus:bg-white focus:border-[#800020]/20 transition-all" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value as any)}>
-                <option value="cash">Direct Cash</option>
-                <option value="pix">Instant Transfer (PIX)</option>
-                <option value="debit">Debit Account</option>
-                <option value="credit">Credit Installments</option>
+                <option value="cash">Dinheiro / Espécie</option>
+                <option value="pix">Transferência Instantânea (PIX)</option>
+                <option value="debit">Cartão de Débito</option>
+                <option value="credit">Cartão de Crédito</option>
               </select>
             </div>
           </div>
@@ -236,10 +236,10 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-center">
-                      <span className="text-[8px] font-bold text-slate-400 uppercase mb-2">Quantity</span>
+                      <span className="text-[8px] font-bold text-slate-400 uppercase mb-2">Quantidade</span>
                       <input type="number" min="1" className="w-16 p-2 bg-slate-50 border border-slate-100 rounded-lg text-center font-bold text-sm outline-none focus:border-[#800020]/20" value={itemQuantity} onChange={e => setItemQuantity(Number(e.target.value))} />
                     </div>
-                    <button type="button" onClick={addItem} className="bg-[#800020] text-white px-8 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md shadow-red-900/10">Add item</button>
+                    <button type="button" onClick={addItem} className="bg-[#800020] text-white px-8 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md shadow-red-900/10">Adicionar item</button>
                     <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] transition-colors"><X size={20} /></button>
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
                       type="text"
-                      placeholder="SEARCH PRODUCT CATALOG..."
+                      placeholder="PESQUISAR NO CATÁLOGO..."
                       className="w-full pl-14 pr-4 py-5 bg-white border border-slate-100 rounded-2xl text-[11px] font-bold uppercase tracking-wider outline-none focus:border-[#800020]/30 transition-all shadow-sm"
                       value={productSearch}
                       onChange={(e) => {
@@ -276,7 +276,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                           </div>
                           <div className="text-right">
                             <span className={`text-[8px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter ${p.displayQuantity <= 0 ? 'bg-red-50 text-[#800020]' : 'bg-slate-50 text-slate-600'}`}>
-                              {p.displayQuantity <= 0 ? 'Out of stock' : `${p.displayQuantity} in stock`}
+                              {p.displayQuantity <= 0 ? 'Sem estoque' : `${p.displayQuantity} em estoque`}
                             </span>
                           </div>
                         </button>
@@ -296,7 +296,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Current Selection</label>
               {items.length === 0 && (
                 <div className="py-10 text-center border border-dashed border-slate-200 rounded-[2rem] bg-white/50">
-                  <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Bag is empty</p>
+                  <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">O carrinho está vazio</p>
                 </div>
               )}
               {items.map((item, idx) => (
@@ -316,11 +316,11 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
 
           <div className="flex justify-between items-center pt-8">
             <div>
-              <span className="font-bold text-slate-400 uppercase text-[10px] tracking-widest block mb-2">Order Value</span>
+              <span className="font-bold text-slate-400 uppercase text-[10px] tracking-widest block mb-2">Valor Total da Venda</span>
               <span className="font-black text-5xl text-slate-950 tracking-tighter">R$ {calculateTotal().toFixed(2)}</span>
             </div>
             <button type="submit" className="bg-[#800020] text-white px-14 py-6 rounded-3xl font-black uppercase tracking-[0.2em] text-[11px] hover:bg-[#600018] shadow-xl shadow-red-900/20 transition-all hover:-translate-y-1">
-              {editingSale ? 'Update Order' : 'Complete Transaction'}
+              {editingSale ? 'Atualizar Venda' : 'Finalizar Transação'}
             </button>
           </div>
         </form>

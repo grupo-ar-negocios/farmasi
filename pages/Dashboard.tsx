@@ -37,10 +37,11 @@ interface DashboardProps {
   consignments: Consignment[];
   salons: Salon[];
   onQuickAction: (view: ViewState) => void;
+  onViewChange: (view: ViewState) => void;
   onImportProducts: (newProducts: Product[]) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignments, salons, onQuickAction, onImportProducts }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignments, salons, onQuickAction, onViewChange, onImportProducts }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
@@ -154,7 +155,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
             FARMASI <span className="text-[#800020] italic block mt-2 text-4xl">Sistema de Gestão</span>
           </h2>
           <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-6 flex items-center gap-3">
-            <Activity size={12} className="text-[#D4AF37]" /> Excellence in Management
+            <Activity size={12} className="text-[#D4AF37]" /> Excelência em Gestão
           </p>
         </div>
 
@@ -227,7 +228,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
             </div>
             <div>
               <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Últimas Vendas</h3>
-              <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Real-time Feed</p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Feed em Tempo Real</p>
             </div>
           </div>
 
@@ -252,7 +253,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
               </div>
             ))}
           </div>
-          <button onClick={() => onQuickAction('sales')} className="w-full mt-10 py-5 bg-[#800020] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">Ver Todas as Vendas</button>
+          <button onClick={() => onViewChange('sales')} className="w-full mt-10 py-5 bg-[#800020] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">Ver Todas as Vendas</button>
         </div>
       </div>
     </div>

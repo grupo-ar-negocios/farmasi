@@ -127,12 +127,12 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
           <table className="w-full text-left">
             <thead className="bg-[#fcf8f9] text-slate-400 font-bold uppercase text-[10px] border-b border-slate-50 tracking-widest">
               <tr>
-                <th className="px-8 py-6">Date</th>
-                <th className="px-8 py-6">Salon Partner</th>
-                <th className="px-8 py-6">Product Item</th>
-                <th className="px-8 py-6 text-center">Qty</th>
+                <th className="px-8 py-6">Data de Envio</th>
+                <th className="px-8 py-6">Salão Parceiro</th>
+                <th className="px-8 py-6">Produto Enviado</th>
+                <th className="px-8 py-6 text-center">Quantidades</th>
                 <th className="px-8 py-6 text-center">Status</th>
-                <th className="px-8 py-6 text-center">Actions</th>
+                <th className="px-8 py-6 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -150,15 +150,15 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
                       <div className="inline-flex items-center gap-2 bg-[#fffafa] border border-slate-100 rounded-full px-4 py-2 text-[10px] font-black uppercase">
                         <span className="text-slate-400">Total:</span>
                         <span className="text-slate-950">{c.quantity}</span>
-                        <span className="text-slate-400">| Sold:</span>
+                        <span className="text-slate-400">| Vendido:</span>
                         <span className="text-emerald-600">{c.soldQuantity}</span>
-                        <span className="text-slate-400">| Left:</span>
+                        <span className="text-slate-400">| Saldo:</span>
                         <span className="text-[#800020]">{remaining}</span>
                       </div>
                     </td>
                     <td className="px-8 py-5 text-center">
                       <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase px-4 py-2 rounded-full">
-                        <CheckCircle2 size={12} /> Active
+                        <CheckCircle2 size={12} /> Em Aberto
                       </span>
                     </td>
                     <td className="px-8 py-5 text-center">

@@ -92,7 +92,7 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 uppercase text-base leading-tight tracking-tight">{client.name}</h3>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Active Partnership</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Parceria Ativa</p>
               </div>
             </div>
 

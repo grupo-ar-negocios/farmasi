@@ -92,12 +92,12 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
           <table className="w-full text-left">
             <thead className="bg-[#fcf8f9] border-b border-slate-50 text-[10px] font-bold uppercase text-slate-400 tracking-widest">
               <tr>
-                <th className="px-8 py-6">Code ID</th>
-                <th className="px-8 py-6">Product Designation</th>
-                <th className="px-8 py-6 text-center">Warehouse</th>
-                <th className="px-8 py-6 text-center">Consigned</th>
-                <th className="px-8 py-6 text-right">Retail Price</th>
-                <th className="px-8 py-6 text-center">Actions</th>
+                <th className="px-8 py-6">ID / Cód</th>
+                <th className="px-8 py-6">Designação do Produto</th>
+                <th className="px-8 py-6 text-center">Estoque Central</th>
+                <th className="px-8 py-6 text-center">Consignado</th>
+                <th className="px-8 py-6 text-right">Preço Venda</th>
+                <th className="px-8 py-6 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">

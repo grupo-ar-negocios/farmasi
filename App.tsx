@@ -344,6 +344,7 @@ function App() {
           consignments={consignments}
           salons={salons}
           onQuickAction={handleQuickAction}
+          onViewChange={handleViewChange}
           onImportProducts={handleImportProducts}
         />;
       case 'inventory':
