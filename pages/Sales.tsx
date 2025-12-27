@@ -185,6 +185,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
               <tr>
                 <th className="px-8 py-6">Data / Hora</th>
                 <th className="px-8 py-6">Cliente</th>
+                <th className="px-8 py-6">Produtos</th>
                 <th className="px-8 py-6">Canal</th>
                 <th className="px-8 py-6 text-right">Valor Total</th>
                 <th className="px-8 py-6 text-center">Ações</th>
@@ -195,6 +196,16 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                 <tr key={sale.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-8 py-6 text-xs font-bold text-slate-900">{new Date(sale.date).toLocaleDateString()}</td>
                   <td className="px-8 py-6 text-xs font-bold text-slate-900 uppercase tracking-tight">{clients.find(c => String(c.id) === String(sale.clientId))?.name || 'Balcão'}</td>
+                  <td className="px-8 py-6">
+                    <div className="flex flex-col gap-1">
+                      {sale.items.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="bg-slate-100 px-1.5 py-0.5 rounded text-[10px] font-black">{item.quantity}x</span>
+                          <span className="text-[10px] font-bold text-slate-600 uppercase truncate max-w-[150px]">{item.productName}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
                   <td className="px-8 py-6">
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tight ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
                       {sale.type === 'direct' ? 'Estoque Central' : 'Entrega Salão'}
