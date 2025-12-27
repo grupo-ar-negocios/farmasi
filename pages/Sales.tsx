@@ -94,6 +94,20 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
 
   const addItem = () => {
     if (!selectedProduct) return;
+
+    // Calcula a quantidade já existente no carrinho para este produto
+    const existingQuantity = items
+      .filter(item => item.productId === selectedProduct.id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+
+    const totalRequested = existingQuantity + itemQuantity;
+    const available = (selectedProduct as any).displayQuantity ?? 0;
+
+    if (totalRequested > available) {
+      alert(`Estoque insuficiente! Disponível: ${available}${existingQuantity > 0 ? ` (já possui ${existingQuantity} no carrinho)` : ''}`);
+      return;
+    }
+
     setItems([...items, {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
@@ -112,6 +126,22 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) { alert("Adicione ao menos um item!"); return; }
+
+    // Validação final de estoque antes de submeter
+    for (const item of items) {
+      const product = baseAvailableProducts.find(p => p.id === item.productId);
+      const available = product?.displayQuantity ?? 0;
+
+      // Agrupar itens do mesmo produto no carrinho para validar o total
+      const totalInCart = items
+        .filter(i => i.productId === item.productId)
+        .reduce((sum, i) => sum + i.quantity, 0);
+
+      if (totalInCart > available) {
+        alert(`O produto "${item.productName}" excedeu o estoque disponível (${available}). Por favor, ajuste o carrinho.`);
+        return;
+      }
+    }
 
     const baseSaleData = {
       date: editingSale ? editingSale.date : new Date().toISOString(),
