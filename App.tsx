@@ -232,7 +232,7 @@ function App() {
     }
   };
 
-  const handleAddSale = async (sale: Sale) => {
+  const handleAddSale = async (sale: Omit<Sale, 'id'>) => {
     setAutoOpenModal(false);
     try {
       // 1. Criar a venda e itens

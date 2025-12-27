@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Client } from '../types';
 import { Users, Phone, Instagram, Plus, Edit2, Trash2, Search } from 'lucide-react';
@@ -6,7 +5,7 @@ import { Modal } from '../components/Modal';
 
 interface ClientsProps {
   clients: Client[];
-  onAdd: (c: Client) => void;
+  onAdd: (c: Omit<Client, 'id'>) => void;
   onEdit: (c: Client) => void;
   onDelete: (id: string) => void;
   startOpen?: boolean;

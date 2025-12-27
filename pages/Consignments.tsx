@@ -8,7 +8,7 @@ interface ConsignmentsProps {
   consignments: Consignment[];
   salons: Salon[];
   products: Product[];
-  onAdd: (c: Consignment) => void;
+  onAdd: (c: Omit<Consignment, 'id'>) => void;
   onEdit: (c: Consignment) => void;
   onDelete: (id: string) => void;
   startOpen?: boolean;
@@ -67,8 +67,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
     e.preventDefault();
     if (!selectedProduct) return;
 
-    const newConsignment: Consignment = {
-      id: editingConsignment ? editingConsignment.id : Date.now().toString(),
+    const baseConsignmentData = {
       salonId,
       productId: selectedProduct.id,
       quantity,
@@ -78,8 +77,15 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
       date: editingConsignment ? editingConsignment.date : new Date().toISOString()
     };
 
-    if (editingConsignment) onEdit(newConsignment);
-    else onAdd(newConsignment);
+    if (editingConsignment) {
+      const updatedConsignment: Consignment = {
+        ...baseConsignmentData,
+        id: editingConsignment.id,
+      };
+      onEdit(updatedConsignment);
+    } else {
+      onAdd(baseConsignmentData);
+    }
     setIsModalOpen(false);
   };
 

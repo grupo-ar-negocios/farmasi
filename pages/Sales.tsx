@@ -10,7 +10,7 @@ interface SalesProps {
   clients: Client[];
   salons: Salon[];
   consignments: Consignment[];
-  onAddSale: (s: Sale) => void;
+  onAddSale: (s: Omit<Sale, 'id'>) => void;
   onEditSale: (s: Sale) => void;
   onDelete: (id: string) => void;
   startOpen?: boolean;
@@ -112,8 +112,8 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) { alert("Adicione ao menos um item!"); return; }
-    const saleData: Sale = {
-      id: editingSale ? editingSale.id : Date.now().toString(),
+
+    const baseSaleData = {
       date: editingSale ? editingSale.date : new Date().toISOString(),
       clientId: selectedClientId || null,
       items: items,
@@ -125,8 +125,15 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
       commissionPaid: editingSale ? editingSale.commissionPaid : false
     };
 
-    if (editingSale) onEditSale(saleData);
-    else onAddSale(saleData);
+    if (editingSale) {
+      const updatedSale: Sale = {
+        ...baseSaleData,
+        id: editingSale.id,
+      } as Sale;
+      onEditSale(updatedSale);
+    } else {
+      onAddSale(baseSaleData as Omit<Sale, 'id'>);
+    }
     closeModal();
   };
 

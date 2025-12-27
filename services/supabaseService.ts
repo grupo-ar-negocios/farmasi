@@ -131,7 +131,10 @@ export const supabaseService = {
             }])
             .select()
             .single();
-        if (error) throw error;
+        if (error) {
+            console.error("Erro ao criar salão:", error);
+            throw error;
+        }
         return data as Salon;
     },
 
@@ -181,7 +184,10 @@ export const supabaseService = {
             }])
             .select()
             .single();
-        if (error) throw error;
+        if (error) {
+            console.error("Erro ao criar consignação:", error);
+            throw error;
+        }
         return data as Consignment;
     },
 
