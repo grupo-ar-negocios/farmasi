@@ -1,35 +1,41 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Studio Luzi Manager</title>
+    <title>FARMASI SISTEMA DE GESTÃO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --brand-primary: #800020; /* Deep Burgundy */
+        --brand-accent: #D4AF37;  /* Metallic Gold */
+        --brand-bg: #FCF9F9;      /* Elegant Off-white */
+      }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #fffafb; /* Rosé fraco puxando pra branco */
-        color: #020617; /* Slate 950 (Preto) */
+        background-color: var(--brand-bg);
+        color: #020617;
       }
-      .no-scrollbar::-webkit-scrollbar {
-          display: none;
-      }
-      .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-      }
-      /* Custom scrollbar for modals */
-      .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-          background: #fff5f7;
-      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #fdf2f4; }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #ffe4e6;
+          background: #e5cbd1;
           border-radius: 10px;
       }
+
+      /* Global Professional Overrides */
+      .btn-primary {
+        background-color: var(--brand-primary);
+        color: white;
+        transition: all 0.3s ease;
+      }
+      .btn-primary:hover {
+        background-color: #600018;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(128, 0, 32, 0.15);
+      }
+      .text-brand { color: var(--brand-primary); }
+      .bg-brand { background-color: var(--brand-primary); }
+      .border-brand { border-color: var(--brand-primary); }
     </style>
   <script type="importmap">
 {

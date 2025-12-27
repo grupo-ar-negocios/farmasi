@@ -68,56 +68,56 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase">
-          <Package className="text-rose-500" size={32} /> Estoque
+        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
+          <Package className="text-[#800020]" size={32} /> Estoque
         </h2>
-        <button onClick={() => openModal()} className="bg-slate-950 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs flex items-center gap-2 hover:bg-black transition-all">
-          <Plus size={20} /> Novo Produto
+        <button onClick={() => openModal()} className="bg-[#800020] text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all">
+          <Plus size={18} /> Novo Produto
         </button>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
         <input
           type="text"
           placeholder="PESQUISAR CÓDIGO OU NOME..."
-          className="w-full pl-12 pr-10 py-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-[11px] uppercase focus:outline-none focus:border-rose-400 transition-all shadow-sm"
+          className="w-full pl-14 pr-10 py-5 bg-white border border-slate-100 rounded-2xl text-slate-950 font-bold text-[10px] uppercase tracking-wider focus:outline-none focus:border-[#800020]/30 shadow-sm transition-all"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-rose-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-[2.5rem] border border-slate-50 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto overflow-y-hidden">
           <table className="w-full text-left">
-            <thead className="bg-[#fffafa] border-b border-rose-100 text-[11px] font-black uppercase text-slate-500">
+            <thead className="bg-[#fcf8f9] border-b border-slate-50 text-[10px] font-bold uppercase text-slate-400 tracking-widest">
               <tr>
-                <th className="p-6">Identificador</th>
-                <th className="p-6">Nome do Produto</th>
-                <th className="p-6 text-center">Depósito</th>
-                <th className="p-6 text-center">Consignado</th>
-                <th className="p-6 text-right">Preço Venda</th>
-                <th className="p-6 text-center">Ações</th>
+                <th className="px-8 py-6">Code ID</th>
+                <th className="px-8 py-6">Product Designation</th>
+                <th className="px-8 py-6 text-center">Warehouse</th>
+                <th className="px-8 py-6 text-center">Consigned</th>
+                <th className="px-8 py-6 text-right">Retail Price</th>
+                <th className="px-8 py-6 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-rose-50">
+            <tbody className="divide-y divide-slate-50">
               {filteredProducts.map(product => (
-                <tr key={product.id} className="hover:bg-rose-50/20 transition-colors">
-                  <td className="p-6 font-black text-slate-950 text-xs">{product.code}</td>
-                  <td className="p-6 font-black text-slate-950 text-xs uppercase">{product.name}</td>
-                  <td className="p-6 text-center">
-                    <span className={`font-black text-xs px-4 py-1.5 rounded-full ${product.stockQuantity <= 3 ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-950'}`}>
+                <tr key={product.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-8 py-6 font-bold text-slate-900 text-xs tracking-tight">{product.code}</td>
+                  <td className="px-8 py-6 font-bold text-slate-900 text-xs uppercase tracking-tight">{product.name}</td>
+                  <td className="px-8 py-6 text-center">
+                    <span className={`font-bold text-[10px] px-4 py-1.5 rounded-full uppercase ${product.stockQuantity <= 3 ? 'bg-red-50 text-[#800020]' : 'bg-slate-50 text-slate-600'}`}>
                       {product.stockQuantity} un
                     </span>
                   </td>
-                  <td className="p-6 text-center font-black text-slate-950 text-xs">
-                    <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full">{product.consignedQuantity} un</span>
+                  <td className="px-8 py-6 text-center font-bold text-slate-900 text-xs">
+                    <span className="bg-blue-50/50 text-blue-600 px-4 py-1.5 rounded-full uppercase text-[10px]">{product.consignedQuantity} un</span>
                   </td>
-                  <td className="p-6 text-right font-black text-slate-950 text-sm">R$ {product.sellPrice.toFixed(2)}</td>
-                  <td className="p-6 text-center">
-                    <div className="flex justify-center gap-4">
-                      <button onClick={() => openModal(product)} className="text-blue-600 hover:scale-125 transition-transform"><Edit2 size={20} /></button>
-                      <button onClick={() => { if (confirm(`Excluir permanentemente "${product.name}"?`)) onDelete(product.id); }} className="text-rose-600 hover:scale-125 transition-transform"><Trash2 size={20} /></button>
+                  <td className="px-8 py-6 text-right font-bold text-slate-950 text-sm">R$ {product.sellPrice.toFixed(2)}</td>
+                  <td className="px-8 py-6 text-center">
+                    <div className="flex justify-center gap-3 opacity-20 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => openModal(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Edit2 size={16} /></button>
+                      <button onClick={() => { if (confirm(`Excluir permanentemente "${product.name}"?`)) onDelete(product.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -127,32 +127,32 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingProduct ? "Editar Registro" : "Cadastrar no Sistema"}>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingProduct ? "Propriedades do Produto" : "Novo Cadastro FARMASI"}>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Código Identificador</label>
-            <input type="text" required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black uppercase text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} />
+            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Código Identificador</label>
+            <input type="text" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold uppercase text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} />
           </div>
           <div>
-            <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Nome do Item</label>
-            <input type="text" required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black uppercase text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Nome do Item</label>
+            <input type="text" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold uppercase text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Custo (R$)</label>
-              <input type="number" step="0.01" required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.costPrice} onChange={e => setFormData({ ...formData, costPrice: Number(e.target.value) })} />
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Custo Unitário (R$)</label>
+              <input type="number" step="0.01" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.costPrice} onChange={e => setFormData({ ...formData, costPrice: Number(e.target.value) })} />
             </div>
             <div>
-              <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Venda (R$)</label>
-              <input type="number" step="0.01" required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.sellPrice} onChange={e => setFormData({ ...formData, sellPrice: Number(e.target.value) })} />
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Venda Sugerida (R$)</label>
+              <input type="number" step="0.01" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.sellPrice} onChange={e => setFormData({ ...formData, sellPrice: Number(e.target.value) })} />
             </div>
           </div>
           <div>
-            <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Quantidade em Depósito</label>
-            <input type="number" required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.stockQuantity} onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })} />
+            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Unidades em Depósito</label>
+            <input type="number" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.stockQuantity} onChange={e => setFormData({ ...formData, stockQuantity: Number(e.target.value) })} />
           </div>
-          <button type="submit" className="w-full bg-slate-950 text-white py-6 rounded-3xl font-black uppercase tracking-widest text-[12px] mt-8 hover:bg-black shadow-xl">
-            Salvar Produto
+          <button type="submit" className="w-full bg-[#800020] text-white py-6 rounded-3xl font-black uppercase tracking-[0.2em] text-[11px] mt-8 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">
+            Confirmar Alterações
           </button>
         </form>
       </Modal>

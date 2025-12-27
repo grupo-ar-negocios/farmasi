@@ -41,14 +41,10 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
       instagram: formData.instagram || ''
     };
 
-    console.log("Clients UI: handleSubmit - Dados do formulário:", clientData);
-
     if (editingClient) {
-      console.log("Clients UI: Modo edição, ID:", editingClient.id);
       clientData.id = editingClient.id;
       onEdit(clientData as Client);
     } else {
-      console.log("Clients UI: Modo criação");
       onAdd(clientData as Client);
     }
 
@@ -63,20 +59,20 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase">
-          <Users className="text-rose-500" size={32} /> Clientes
+        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
+          <Users className="text-[#800020]" size={32} /> Clientes
         </h2>
-        <button onClick={handleOpenAdd} className="bg-slate-950 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs flex items-center gap-2 hover:bg-black transition-all">
-          <Plus size={20} /> Novo Cliente
+        <button onClick={handleOpenAdd} className="bg-[#800020] text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all">
+          <Plus size={18} /> Novo Cliente
         </button>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
         <input
           type="text"
           placeholder="PESQUISAR POR NOME OU WHATSAPP..."
-          className="w-full pl-12 pr-6 py-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-[12px] uppercase focus:outline-none focus:border-rose-400 shadow-sm transition-all"
+          className="w-full pl-14 pr-6 py-5 bg-white border border-slate-100 rounded-2xl text-slate-950 font-bold text-[10px] uppercase tracking-wider focus:outline-none focus:border-[#800020]/30 shadow-sm transition-all placeholder:text-slate-300"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -84,29 +80,29 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredClients.map(client => (
-          <div key={client.id} className="bg-white p-8 rounded-[2.5rem] border border-rose-100 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+          <div key={client.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group relative overflow-hidden">
             <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-              <button onClick={() => handleOpenEdit(client)} className="p-3 text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100"><Edit2 size={20} /></button>
-              <button onClick={() => { if (confirm(`Excluir permanentemente o cliente "${client.name}"?`)) onDelete(client.id); }} className="p-3 text-rose-600 bg-rose-50 rounded-xl hover:bg-rose-100"><Trash2 size={20} /></button>
+              <button onClick={() => handleOpenEdit(client)} className="p-3 text-blue-600 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors"><Edit2 size={18} /></button>
+              <button onClick={() => { if (confirm(`Excluir permanentemente o cliente "${client.name}"?`)) onDelete(client.id); }} className="p-3 text-[#800020] bg-red-50/50 rounded-xl hover:bg-red-50 transition-colors"><Trash2 size={18} /></button>
             </div>
 
             <div className="flex items-center gap-5 mb-8">
-              <div className="w-16 h-16 bg-[#fffafa] rounded-[1.25rem] border border-rose-100 flex items-center justify-center text-rose-400 font-black text-2xl shadow-inner">
-                {client.name.charAt(0).toUpperCase()}
+              <div className="w-16 h-16 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center text-[#800020] font-black text-2xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.03)] uppercase">
+                {client.name.charAt(0)}
               </div>
               <div>
-                <h3 className="font-black text-slate-950 uppercase text-lg leading-tight">{client.name}</h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Cadastro Ativo</p>
+                <h3 className="font-bold text-slate-900 uppercase text-base leading-tight tracking-tight">{client.name}</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Active Partnership</p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex items-center gap-4 text-xs text-slate-950 font-bold bg-[#fffafa] p-4 rounded-2xl border border-rose-50">
-                <Phone size={16} className="text-rose-400" /> {client.phone}
+              <div className="flex items-center gap-4 text-[11px] text-slate-700 font-bold bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                <Phone size={14} className="text-[#D4AF37]" /> {client.phone}
               </div>
               {client.instagram && (
-                <div className="flex items-center gap-4 text-xs text-slate-950 font-bold bg-[#fffafa] p-4 rounded-2xl border border-rose-50">
-                  <Instagram size={16} className="text-pink-500" /> {client.instagram}
+                <div className="flex items-center gap-4 text-[11px] text-slate-700 font-bold bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                  <Instagram size={14} className="text-[#800020]" /> {client.instagram}
                 </div>
               )}
             </div>
@@ -120,22 +116,22 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingClient ? "Editar Cadastro" : "Adicionar Cliente"}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingClient ? "Editar Registro" : "Novo Cadastro"}>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="text-[11px] font-black text-slate-500 uppercase mb-2 block tracking-widest">Nome Completo</label>
-            <input required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black uppercase text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+            <label className="text-[10px] font-bold text-slate-400 uppercase mb-3 block tracking-[0.2em]">Nome Completo</label>
+            <input required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold uppercase text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)]" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} />
           </div>
           <div>
-            <label className="text-[11px] font-black text-slate-500 uppercase mb-2 block tracking-widest">WhatsApp / Celular</label>
-            <input required className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+            <label className="text-[10px] font-bold text-slate-400 uppercase mb-3 block tracking-[0.2em]">WhatsApp Comercial</label>
+            <input required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)]" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
           </div>
           <div>
-            <label className="text-[11px] font-black text-slate-500 uppercase mb-2 block tracking-widest">Instagram (Opcional)</label>
-            <input placeholder="@exemplo" className="w-full p-5 bg-[#fffafa] border-2 border-rose-50 rounded-2xl text-slate-950 font-black text-xs focus:bg-white focus:border-rose-400 outline-none transition-all shadow-inner" value={formData.instagram || ''} onChange={e => setFormData({ ...formData, instagram: e.target.value })} />
+            <label className="text-[10px] font-bold text-slate-400 uppercase mb-3 block tracking-[0.2em]">Instagram Profile (Opcional)</label>
+            <input placeholder="@user" className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)]" value={formData.instagram || ''} onChange={e => setFormData({ ...formData, instagram: e.target.value })} />
           </div>
-          <button type="submit" className="w-full bg-slate-950 text-white py-6 rounded-3xl font-black uppercase tracking-widest text-[12px] mt-8 hover:bg-black transition-all">
-            {editingClient ? 'Salvar Alterações' : 'Concluir Cadastro'}
+          <button type="submit" className="w-full bg-[#800020] text-white py-6 rounded-3xl font-black uppercase tracking-widest text-[11px] mt-8 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">
+            {editingClient ? 'Salvar Alterações' : 'Concluir Cadastro FARMASI'}
           </button>
         </form>
       </Modal>

@@ -109,11 +109,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
   };
 
   const QuickActionButton = ({ icon: Icon, label, onClick, bgColor, iconColor }: any) => (
-    <button onClick={onClick} className="flex flex-col items-center justify-center p-6 rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-sm border border-rose-100 bg-white group hover:border-rose-300">
-      <div className={`${bgColor} p-5 rounded-2xl mb-3 shadow-inner transition-transform group-hover:scale-110`}>
+    <button onClick={onClick} className="flex flex-col items-center justify-center p-6 rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-sm border border-slate-100 bg-white group hover:border-[#800020]/20">
+      <div className={`${bgColor} p-5 rounded-2xl mb-3 shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] transition-transform group-hover:scale-110`}>
         <Icon size={28} className={iconColor} />
       </div>
-      <span className="font-black text-[11px] text-slate-950 uppercase tracking-widest">{label}</span>
+      <span className="font-bold text-[10px] text-slate-800 uppercase tracking-widest">{label}</span>
     </button>
   );
 
@@ -122,19 +122,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
       {/* Overlay de Importação */}
       {isImporting && (
-        <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-white">
+        <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-white">
           <div className="w-full max-w-md space-y-8 text-center animate-in zoom-in duration-300">
-            <Loader2 size={64} className="mx-auto text-rose-500 animate-spin mb-4" />
-            <h2 className="text-3xl font-black uppercase tracking-tighter">Lendo sua Planilha</h2>
-            <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">Aguarde enquanto organizamos os dados do Studio Luzi...</p>
+            <Loader2 size={64} className="mx-auto text-[#D4AF37] animate-spin mb-4" />
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Processando Planilha</h2>
+            <p className="text-slate-400 font-bold uppercase text-[9px] tracking-[0.4em]">Sincronizando dados com o sistema FARMASI...</p>
 
-            <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+            <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
               <div
-                className="h-full bg-rose-500 transition-all duration-500 ease-out"
+                className="h-full bg-[#800020] transition-all duration-500 ease-out shadow-[0_0_12px_rgba(128,0,32,0.5)]"
                 style={{ width: `${importProgress}%` }}
               ></div>
             </div>
-            <span className="text-rose-500 font-black text-xs">{importProgress}%</span>
+            <span className="text-[#D4AF37] font-black text-xs tracking-widest">{importProgress}%</span>
           </div>
         </div>
       )}
@@ -150,9 +150,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div>
-          <h2 className="text-5xl font-black text-slate-950 uppercase tracking-tighter leading-none">Studio Luzi <span className="text-rose-500 italic block mt-2">Farmasi</span></h2>
-          <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.4em] mt-4 flex items-center gap-2">
-            <Activity size={14} className="text-rose-500" /> Gestão Administrativa
+          <h2 className="text-5xl font-black text-slate-950 uppercase tracking-tighter leading-none">
+            FARMASI <span className="text-[#800020] italic block mt-2 text-4xl">Sistema de Gestão</span>
+          </h2>
+          <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-6 flex items-center gap-3">
+            <Activity size={12} className="text-[#D4AF37]" /> Excellence in Management
           </p>
         </div>
 
@@ -177,10 +179,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
-        <QuickActionButton icon={ShoppingCart} label="Vendas" onClick={() => onQuickAction('sales')} bgColor="bg-rose-50" iconColor="text-rose-500" />
+        <QuickActionButton icon={ShoppingCart} label="Vendas" onClick={() => onQuickAction('sales')} bgColor="bg-[#800020]/5" iconColor="text-[#800020]" />
         <QuickActionButton icon={Package} label="Estoque" onClick={() => onQuickAction('inventory')} bgColor="bg-emerald-50" iconColor="text-emerald-500" />
         <QuickActionButton icon={Handshake} label="Consignados" onClick={() => onQuickAction('consignments')} bgColor="bg-blue-50" iconColor="text-blue-500" />
-        <QuickActionButton icon={Store} label="Salões" onClick={() => onQuickAction('salons')} bgColor="bg-amber-50" iconColor="text-amber-500" />
+        <QuickActionButton icon={Store} label="Salões" onClick={() => onQuickAction('salons')} bgColor="bg-[#D4AF37]/10" iconColor="text-[#D4AF37]" />
         <QuickActionButton icon={Users} label="Clientes" onClick={() => onQuickAction('clients')} bgColor="bg-violet-50" iconColor="text-violet-500" />
       </div>
 
@@ -192,65 +194,65 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-7 bg-white p-10 rounded-[3rem] shadow-sm border border-rose-100">
-          <div className="flex justify-between items-center mb-16">
-            <h3 className="text-sm font-black text-slate-950 uppercase tracking-[0.3em]">Fluxo de Caixa</h3>
-            <div className="bg-[#fffafa] px-4 py-2 rounded-full border border-rose-50 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
-              <span className="text-[10px] font-black text-slate-950 uppercase">Tempo Real</span>
+        <div className="lg:col-span-7 bg-white p-10 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-16 relative z-10">
+            <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Relatório de Fluxo</h3>
+            <div className="bg-slate-50 px-4 py-2 rounded-full border border-slate-100 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Sincronizado</span>
             </div>
           </div>
-          <div className="h-96 w-full">
+          <div className="h-96 w-full relative z-10">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#800020" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#800020" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }} dy={15} />
-                <Tooltip contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', fontWeight: 900, fontSize: '11px' }} />
-                <Area type="monotone" dataKey="value" stroke="#f43f5e" strokeWidth={5} fillOpacity={1} fill="url(#colorVal)" dot={{ r: 6, fill: '#fff', strokeWidth: 3, stroke: '#f43f5e' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#cbd5e1', fontSize: 9, fontWeight: 700 }} dy={15} />
+                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', fontWeight: 700, fontSize: '10px', textTransform: 'uppercase' }} />
+                <Area type="monotone" dataKey="value" stroke="#800020" strokeWidth={4} fillOpacity={1} fill="url(#colorVal)" dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#800020' }} activeDot={{ r: 6, fill: '#800020', strokeWidth: 0 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="lg:col-span-5 bg-white p-10 rounded-[3rem] shadow-sm border border-rose-100 flex flex-col h-full">
+        <div className="lg:col-span-5 bg-white p-10 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col h-full">
           <div className="flex items-center gap-4 mb-10">
-            <div className="p-4 bg-rose-50 text-rose-500 rounded-2xl">
+            <div className="p-4 bg-slate-50 text-[#D4AF37] rounded-2xl border border-slate-100">
               <History size={24} />
             </div>
             <div>
-              <h3 className="text-sm font-black text-slate-950 uppercase tracking-[0.3em]">Últimas Vendas</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Atividade Recente</p>
+              <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Últimas Vendas</h3>
+              <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Real-time Feed</p>
             </div>
           </div>
 
           <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar max-h-[450px]">
             {sales.slice().reverse().slice(0, 8).map(sale => (
-              <div key={sale.id} className="flex items-center justify-between p-5 bg-[#fffafa] rounded-2xl border border-rose-50 hover:border-rose-200 transition-all">
+              <div key={sale.id} className="flex items-center justify-between p-5 bg-slate-50/50 rounded-2xl border border-slate-100/50 hover:border-[#800020]/20 transition-all group">
                 <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500'}`}>
+                  <div className={`p-3 rounded-xl transition-colors ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
                     <ArrowUpRight size={18} />
                   </div>
                   <div>
-                    <p className="text-[11px] font-black text-slate-950 uppercase">{sale.items.length} {sale.items.length === 1 ? 'item' : 'itens'}</p>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">{new Date(sale.date).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</p>
+                    <p className="text-[11px] font-bold text-slate-800 uppercase">{sale.items.length} {sale.items.length === 1 ? 'item' : 'itens'}</p>
+                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">{new Date(sale.date).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black text-slate-950">R$ {sale.totalValue.toFixed(0)}</p>
-                  <p className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full inline-block mt-1 ${sale.type === 'direct' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                  <p className="text-sm font-bold text-slate-900">R$ {sale.totalValue.toFixed(0)}</p>
+                  <p className={`text-[8px] font-bold uppercase px-2 py-0.5 rounded-full inline-block mt-1 ${sale.type === 'direct' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
                     {sale.type === 'direct' ? 'Estoque' : 'Salão'}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <button onClick={() => onQuickAction('sales')} className="w-full mt-8 py-4 bg-slate-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black shadow-lg">Ver Todas</button>
+          <button onClick={() => onQuickAction('sales')} className="w-full mt-10 py-5 bg-[#800020] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">Ver Todas as Vendas</button>
         </div>
       </div>
     </div>

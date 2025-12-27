@@ -23,6 +23,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
   const [productSearch, setProductSearch] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (startOpen) openModal();
@@ -56,6 +57,15 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
       p.code.toLowerCase().includes(term)
     ).slice(0, 5);
   }, [products, productSearch]);
+
+  const filteredConsignments = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    if (!term) return consignments;
+    return consignments.filter(c => {
+      const salon = salons.find(s => String(s.id) === String(c.salonId));
+      return salon?.name.toLowerCase().includes(term);
+    });
+  }, [consignments, salons, searchTerm]);
 
   const handleSelectProduct = (p: Product) => {
     setSelectedProduct(p);
@@ -92,61 +102,84 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase">
-          <Handshake className="text-rose-500" size={32} /> Consignados
+        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
+          <Handshake className="text-[#800020]" size={32} /> Consignações
         </h2>
-        <button onClick={() => openModal()} className="bg-slate-950 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs flex items-center gap-2 hover:bg-black transition-all shadow-lg shadow-rose-100">
-          <Plus size={20} /> Novo Consignado
-        </button>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-4 bg-white border border-slate-100 px-6 py-4 rounded-2xl shadow-sm text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+            <Search size={18} />
+            <input
+              type="text"
+              placeholder="Filter by salon..."
+              className="outline-none placeholder:text-slate-300 text-slate-900 w-48 bg-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </label>
+          <button onClick={() => openModal()} className="bg-[#800020] text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 shadow-lg shadow-red-900/10 hover:bg-[#600018] transition-all">
+            <Plus size={18} /> Novo Envio
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {consignments.filter(c => c.status === 'active').map(c => {
-          const salon = salons.find(s => String(s.id) === String(c.salonId));
-          const product = products.find(p => String(p.id) === String(c.productId));
-          const remaining = c.quantity - c.soldQuantity - c.returnedQuantity;
+      <div className="bg-white rounded-[2.5rem] border border-slate-50 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto overflow-y-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-[#fcf8f9] text-slate-400 font-bold uppercase text-[10px] border-b border-slate-50 tracking-widest">
+              <tr>
+                <th className="px-8 py-6">Date</th>
+                <th className="px-8 py-6">Salon Partner</th>
+                <th className="px-8 py-6">Product Item</th>
+                <th className="px-8 py-6 text-center">Qty</th>
+                <th className="px-8 py-6 text-center">Status</th>
+                <th className="px-8 py-6 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {filteredConsignments.map(c => {
+                const salon = salons.find(s => String(s.id) === String(c.salonId));
+                const product = products.find(p => String(p.id) === String(c.productId));
+                const remaining = c.quantity - c.soldQuantity - c.returnedQuantity;
 
-          return (
-            <div key={c.id} className="bg-white p-6 rounded-3xl border border-rose-100 shadow-sm relative group">
-              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => openModal(c)} className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Edit2 size={14} /></button>
-                <button onClick={() => { if (confirm("Excluir consignado?")) onDelete(c.id); }} className="p-2 bg-rose-50 text-rose-600 rounded-lg"><Trash2 size={14} /></button>
-              </div>
-              <div className="mb-4">
-                <h3 className="font-black text-slate-950 uppercase text-sm mb-1">{salon?.name}</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">{new Date(c.date).toLocaleDateString()}</p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-slate-950">
-                  <ArrowRight size={14} className="text-rose-400" />
-                  <span className="font-black text-xs uppercase">{product?.name}</span>
-                </div>
-                <div className="bg-[#fffafa] p-4 rounded-2xl border border-rose-50 grid grid-cols-3 gap-2 text-center">
-                  <div>
-                    <span className="text-[8px] font-black text-slate-400 uppercase block">Total</span>
-                    <span className="text-xs font-black text-slate-950">{c.quantity}</span>
-                  </div>
-                  <div>
-                    <span className="text-[8px] font-black text-slate-400 uppercase block">Vendidos</span>
-                    <span className="text-xs font-black text-emerald-600">{c.soldQuantity}</span>
-                  </div>
-                  <div>
-                    <span className="text-[8px] font-black text-slate-400 uppercase block">Saldo</span>
-                    <span className="text-xs font-black text-rose-500">{remaining}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+                return (
+                  <tr key={c.id} className="group hover:bg-slate-50 transition-colors">
+                    <td className="px-8 py-5 text-slate-950 font-bold text-xs uppercase">{new Date(c.date).toLocaleDateString()}</td>
+                    <td className="px-8 py-5 text-slate-950 font-bold text-xs uppercase">{salon?.name}</td>
+                    <td className="px-8 py-5 text-slate-950 font-bold text-xs uppercase">{product?.name}</td>
+                    <td className="px-8 py-5 text-center">
+                      <div className="inline-flex items-center gap-2 bg-[#fffafa] border border-slate-100 rounded-full px-4 py-2 text-[10px] font-black uppercase">
+                        <span className="text-slate-400">Total:</span>
+                        <span className="text-slate-950">{c.quantity}</span>
+                        <span className="text-slate-400">| Sold:</span>
+                        <span className="text-emerald-600">{c.soldQuantity}</span>
+                        <span className="text-slate-400">| Left:</span>
+                        <span className="text-[#800020]">{remaining}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-center">
+                      <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase px-4 py-2 rounded-full">
+                        <CheckCircle2 size={12} /> Active
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-center">
+                      <div className="flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openModal(c)} className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Edit2 size={14} /></button>
+                        <button onClick={() => { if (confirm("Excluir consignado?")) onDelete(c.id); }} className="p-2 bg-red-50 text-red-600 rounded-lg"><Trash2 size={14} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingConsignment ? "Editar Consignado" : "Enviar Consignado"}>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Salão Parceiro</label>
-            <select required className="w-full p-4 bg-[#fffafa] border-2 border-rose-100 rounded-2xl text-slate-950 font-black text-xs uppercase outline-none focus:border-rose-400" value={salonId} onChange={e => setSalonId(e.target.value)}>
+            <select required className="w-full p-4 bg-[#fffafa] border-2 border-slate-100 rounded-2xl text-slate-950 font-black text-xs uppercase outline-none focus:border-[#800020]" value={salonId} onChange={e => setSalonId(e.target.value)}>
               <option value="">Selecione o Salão...</option>
               {salons.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
@@ -156,25 +189,25 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
             <label className="block text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Produto para Envio</label>
 
             {selectedProduct ? (
-              <div className="flex items-center justify-between bg-white p-5 rounded-2xl border-2 border-rose-500 animate-in zoom-in duration-300 shadow-sm">
+              <div className="flex items-center justify-between bg-white p-5 rounded-2xl border-2 border-[#800020] animate-in zoom-in duration-300 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <CheckCircle2 className="text-rose-500" size={24} />
+                  <CheckCircle2 className="text-[#800020]" size={24} />
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Selecionado</p>
                     <p className="text-sm font-black text-slate-950 uppercase">{selectedProduct.name}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase">Em Estoque: {selectedProduct.stockQuantity} un</p>
                   </div>
                 </div>
-                <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-400 hover:text-rose-500 p-2"><X size={20} /></button>
+                <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-400 hover:text-[#800020] p-2"><X size={20} /></button>
               </div>
             ) : (
               <div className="relative">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-400" size={18} />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#800020]" size={18} />
                   <input
                     type="text"
                     placeholder="PESQUISAR PRODUTO NO ESTOQUE..."
-                    className="w-full pl-12 pr-4 py-4 bg-[#fffafa] border-2 border-rose-100 rounded-2xl text-[11px] font-black uppercase tracking-wider outline-none focus:border-rose-400 focus:bg-white"
+                    className="w-full pl-12 pr-4 py-4 bg-[#fffafa] border-2 border-slate-100 rounded-2xl text-[11px] font-black uppercase tracking-wider outline-none focus:border-[#800020] focus:bg-white"
                     value={productSearch}
                     onChange={(e) => {
                       setProductSearch(e.target.value);
@@ -184,7 +217,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
                 </div>
 
                 {showResults && filteredProducts.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-2 border-rose-100 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-2 border-slate-100 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     {filteredProducts.map(p => (
                       <button
                         key={p.id}
