@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Client } from '../types';
-import { Users, Phone, Instagram, Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Client, Sale } from '../types';
+import { Users, Phone, Instagram, Plus, Edit2, Trash2, Search, History, Calendar, Package, DollarSign } from 'lucide-react';
 import { Modal } from '../components/Modal';
 
 interface ClientsProps {
   clients: Client[];
+  sales: Sale[];
   onAdd: (c: Omit<Client, 'id'>) => void;
   onEdit: (c: Client) => void;
   onDelete: (id: string) => void;
   startOpen?: boolean;
 }
 
-export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDelete, startOpen }) => {
+export const Clients: React.FC<ClientsProps> = ({ clients, sales, onAdd, onEdit, onDelete, startOpen }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<Partial<Client>>({});
+  const [historyClient, setHistoryClient] = useState<Client | null>(null);
 
   useEffect(() => {
     if (startOpen) handleOpenAdd();
@@ -58,11 +60,11 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl md:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
           <Users className="text-[#800020]" size={32} /> Clientes
         </h2>
-        <button onClick={handleOpenAdd} className="bg-[#800020] text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all">
+        <button onClick={handleOpenAdd} className="w-full sm:w-auto bg-[#800020] text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all">
           <Plus size={18} /> Novo Cliente
         </button>
       </div>
@@ -106,6 +108,13 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
                 </div>
               )}
             </div>
+
+            <button
+              onClick={() => setHistoryClient(client)}
+              className="w-full mt-6 py-4 bg-slate-950 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#800020] transition-colors"
+            >
+              <History size={14} /> Ver Histórico de Compras
+            </button>
           </div>
         ))}
         {filteredClients.length === 0 && (
@@ -134,6 +143,50 @@ export const Clients: React.FC<ClientsProps> = ({ clients, onAdd, onEdit, onDele
             {editingClient ? 'Salvar Alterações' : 'Concluir Cadastro FARMASI'}
           </button>
         </form>
+      </Modal>
+
+      <Modal isOpen={!!historyClient} onClose={() => setHistoryClient(null)} title={`Histórico: ${historyClient?.name}`}>
+        <div className="space-y-4">
+          {sales.filter(s => s.clientId === historyClient?.id).length === 0 ? (
+            <div className="py-12 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+              Nenhuma compra registrada para este cliente.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {sales.filter(s => s.clientId === historyClient?.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(sale => (
+                <div key={sale.id} className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                  <div className="flex justify-between items-center mb-4 pb-4 border-b border-slate-200/50">
+                    <div className="flex items-center gap-2 text-slate-900 font-black text-[10px] uppercase">
+                      <Calendar size={14} className="text-[#800020]" />
+                      {new Date(sale.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </div>
+                    <div className="text-[#800020] font-black text-sm">
+                      R$ {sale.totalValue.toFixed(2)}
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {sale.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-[11px]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-white rounded-lg border border-slate-100 flex items-center justify-center text-[#800020]">
+                            <Package size={12} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-800 uppercase">{item.productName}</p>
+                            <p className="text-[9px] text-slate-400 uppercase">{item.quantity} x R$ {item.unitPrice.toFixed(2)}</p>
+                          </div>
+                        </div>
+                        <div className="font-bold text-slate-700">
+                          R$ {(item.quantity * item.unitPrice).toFixed(2)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </Modal>
     </div>
   );

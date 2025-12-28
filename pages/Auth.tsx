@@ -46,7 +46,7 @@ export function Auth() {
                             <Sparkles className="text-white w-8 h-8" />
                         </div>
                         <h1 className="text-3xl font-black text-slate-950 uppercase tracking-tighter">
-                            Studio <span className="text-rose-500 italic">Luzi</span>
+                            FARMASI
                         </h1>
                         <p className="text-[10px] text-slate-400 font-bold tracking-[0.3em] mt-2">SISTEMA DE GESTÃO</p>
                     </div>
@@ -128,7 +128,7 @@ export function Auth() {
 
                 {/* Support lines */}
                 <p className="text-center mt-8 text-[10px] text-slate-400 font-medium tracking-widest uppercase">
-                    Studio Luzi &copy; 2024 • Gestão de Alta Performance
+                    FARMASI &copy; 2025 • Gestão de Alta Performance
                 </p>
             </div>
         </div>

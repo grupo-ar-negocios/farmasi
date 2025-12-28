@@ -151,8 +151,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div>
-          <h2 className="text-5xl font-black text-slate-950 uppercase tracking-tighter leading-none">
-            FARMASI <span className="text-[#800020] italic block mt-2 text-4xl">Sistema de Gestão</span>
+          <h2 className="text-3xl md:text-5xl font-black text-slate-950 uppercase tracking-tighter leading-none">
+            FARMASI <span className="text-[#800020] italic block mt-2 text-2xl md:text-4xl">Sistema de Gestão</span>
           </h2>
           <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-6 flex items-center gap-3">
             <Activity size={12} className="text-[#D4AF37]" /> Excelência em Gestão
@@ -179,7 +179,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         <QuickActionButton icon={ShoppingCart} label="Vendas" onClick={() => onQuickAction('sales')} bgColor="bg-[#800020]/5" iconColor="text-[#800020]" />
         <QuickActionButton icon={Package} label="Estoque" onClick={() => onQuickAction('inventory')} bgColor="bg-emerald-50" iconColor="text-emerald-500" />
         <QuickActionButton icon={Handshake} label="Consignados" onClick={() => onQuickAction('consignments')} bgColor="bg-blue-50" iconColor="text-blue-500" />
