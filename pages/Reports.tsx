@@ -106,56 +106,56 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
   }, [sales]);
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-12">
+    <div className="space-y-8 sm:space-y-10 animate-in fade-in duration-500 pb-20 sm:pb-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-4xl font-black text-slate-950 uppercase tracking-tighter">Relatórios <span className="text-rose-500 italic">Estratégicos</span></h2>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mt-2 flex items-center gap-2">
-            <Target size={14} className="text-rose-500" /> Inteligência de Negócio FARMASI
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 uppercase tracking-tighter">Relatórios <span className="text-[#800020] italic">Estratégicos</span></h2>
+          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] sm:tracking-[0.4em] mt-2 flex items-center gap-2">
+            <Target size={14} className="text-[#800020]" /> Inteligência FARMASI
           </p>
         </div>
-        <div className="bg-white px-6 py-3 rounded-2xl border border-rose-100 flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-          <span className="text-[11px] font-black text-slate-900 uppercase">Análise de Dados Ativa</span>
+        <div className="bg-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-[#800020]/10 flex items-center gap-3">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span className="text-[10px] sm:text-[11px] font-black text-slate-900 uppercase">Análise de Dados Ativa</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <StatCard title="Ticket Médio" value={`R$ ${avgTicket.toFixed(0)}`} icon={Award} color="violet" subtext="Média por venda" />
         <StatCard title="Total Vendidos" value={`${totalItemsSold} un`} icon={ShoppingCart} color="emerald" subtext="Itens despachados" />
         <StatCard title="Margem Média" value={`${profitMargin.toFixed(1)}%`} icon={TrendingUp} color="blue" subtext="Eficiência de lucro" />
         <StatCard title="Faturamento" value={`R$ ${totalRevenue.toLocaleString()}`} icon={BarChart3} color="amber" subtext="Receita Bruta" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
         {/* Main Revenue Chart */}
-        <div className="lg:col-span-8 bg-white p-8 rounded-[3rem] border border-rose-100 shadow-sm">
-          <h3 className="text-sm font-black text-slate-950 uppercase tracking-[0.3em] mb-12">Evolução de Faturamento</h3>
-          <div className="h-80 w-full">
+        <div className="lg:col-span-8 bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm">
+          <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-8 sm:mb-12">Evolução de Faturamento</h3>
+          <div className="h-64 sm:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#800020" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#800020" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }} dy={15} />
-                <Tooltip contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', fontWeight: 900, fontSize: '11px' }} />
-                <Area type="monotone" dataKey="value" stroke="#f43f5e" strokeWidth={5} fillOpacity={1} fill="url(#colorRev)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 900 }} dy={10} />
+                <Tooltip contentStyle={{ borderRadius: '15px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', fontWeight: 900, fontSize: '10px' }} />
+                <Area type="monotone" dataKey="value" stroke="#800020" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Payment Methods */}
-        <div className="lg:col-span-4 bg-white p-8 rounded-[3rem] border border-rose-100 shadow-sm flex flex-col items-center">
-          <h3 className="text-sm font-black text-slate-950 uppercase tracking-[0.3em] mb-8 w-full">Meios de Pagamento</h3>
-          <div className="h-64 w-full relative">
+        <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm flex flex-col items-center">
+          <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-6 sm:mb-8 w-full">Meios de Pagamento</h3>
+          <div className="h-48 sm:h-64 w-full relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={paymentMethodsData} innerRadius={60} outerRadius={80} paddingAngle={10} dataKey="value">
+                <Pie data={paymentMethodsData} innerRadius={50} outerRadius={70} paddingAngle={8} dataKey="value">
                   {paymentMethodsData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -164,12 +164,12 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <PieChartIcon className="text-rose-100" size={32} />
+              <PieChartIcon className="text-slate-100" size={24} />
             </div>
           </div>
-          <div className="w-full mt-6 space-y-2">
+          <div className="w-full mt-4 sm:mt-6 space-y-2">
             {paymentMethodsData.map(method => (
-              <div key={method.name} className="flex items-center justify-between text-[10px] font-black uppercase">
+              <div key={method.name} className="flex items-center justify-between text-[9px] sm:text-[10px] font-black uppercase">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: method.color }}></div>
                   <span className="text-slate-500">{method.name}</span>
@@ -181,28 +181,28 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Top Products */}
-        <div className="bg-white p-10 rounded-[3rem] border border-rose-100 shadow-sm">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="p-4 bg-emerald-50 text-emerald-500 rounded-2xl"><Award size={24} /></div>
+        <div className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm">
+          <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+            <div className="p-3 sm:p-4 bg-emerald-50 text-emerald-500 rounded-xl sm:rounded-2xl shrink-0"><Award size={24} /></div>
             <div>
-              <h3 className="text-sm font-black text-slate-950 uppercase tracking-[0.3em]">Top 5 Produtos</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase">Ranking de Volume</p>
+              <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Top 5 Produtos</h3>
+              <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Volume de Vendas</p>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {topProducts.map((p, i) => (
-              <div key={p.name} className="flex items-center justify-between p-5 bg-[#fffafa] rounded-2xl border border-rose-50 group hover:border-emerald-200 transition-all">
-                <div className="flex items-center gap-4">
-                  <span className="text-lg font-black text-emerald-300">#0{i + 1}</span>
-                  <div>
-                    <p className="text-xs font-black text-slate-950 uppercase">{p.name}</p>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">{p.qty} unidades vendidas</p>
+              <div key={p.name} className="flex items-center justify-between p-4 sm:p-5 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 group transition-all">
+                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+                  <span className="text-base sm:text-lg font-black text-emerald-300">#0{i + 1}</span>
+                  <div className="overflow-hidden">
+                    <p className="text-[11px] font-black text-slate-950 uppercase truncate">{p.name}</p>
+                    <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">{p.qty} un</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-black text-slate-950">R$ {p.revenue.toLocaleString()}</p>
+                <div className="text-right shrink-0">
+                  <p className="text-[12px] sm:text-sm font-black text-slate-950">R$ {p.revenue.toLocaleString()}</p>
                   <ArrowUpRight size={14} className="text-emerald-500 ml-auto" />
                 </div>
               </div>
@@ -211,32 +211,32 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
         </div>
 
         {/* Salon Performance */}
-        <div className="bg-white p-10 rounded-[3rem] border border-rose-100 shadow-sm">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="p-4 bg-rose-50 text-rose-500 rounded-2xl"><BarChart3 size={24} /></div>
+        <div className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm">
+          <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+            <div className="p-3 sm:p-4 bg-blue-50 text-blue-500 rounded-xl sm:rounded-2xl shrink-0"><BarChart3 size={24} /></div>
             <div>
-              <h3 className="text-sm font-black text-slate-950 uppercase tracking-[0.3em]">Performance de Salões</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase">Volume por Parceria</p>
+              <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Performance Parceiros</h3>
+              <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Receita por Salão</p>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-6">
             {salonPerformance.map((salon) => (
               <div key={salon.name} className="space-y-2">
-                <div className="flex justify-between text-[11px] font-black uppercase">
-                  <span className="text-slate-950">{salon.name}</span>
-                  <span className="text-rose-500">R$ {salon.revenue.toLocaleString()}</span>
+                <div className="flex justify-between text-[10px] sm:text-[11px] font-black uppercase overflow-hidden">
+                  <span className="text-slate-950 truncate mr-4">{salon.name}</span>
+                  <span className="text-[#800020] shrink-0">R$ {salon.revenue.toLocaleString()}</span>
                 </div>
-                <div className="w-full h-3 bg-rose-50 rounded-full overflow-hidden">
+                <div className="w-full h-2 sm:h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
                   <div
-                    className="h-full bg-rose-500 rounded-full transition-all duration-1000"
+                    className="h-full bg-[#800020]/80 rounded-full transition-all duration-1000"
                     style={{ width: `${(salon.revenue / (salonPerformance[0]?.revenue || 1)) * 100}%` }}
                   />
                 </div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase text-right">{salon.count} vendas registradas</p>
+                <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase text-right">{salon.count} vendas</p>
               </div>
             ))}
             {salonPerformance.length === 0 && (
-              <div className="py-20 text-center text-slate-400 font-black uppercase text-xs">Nenhum dado disponível</div>
+              <div className="py-16 text-center text-slate-400 font-black uppercase text-[10px] tracking-widest">Nenhum dado disponível</div>
             )}
           </div>
         </div>

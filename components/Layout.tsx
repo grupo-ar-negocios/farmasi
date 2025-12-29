@@ -97,37 +97,51 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-xl z-50 border-b border-slate-100 px-6 py-4 flex justify-between items-center shadow-sm">
-        <h1 className="text-xl font-black text-[#800020] tracking-tighter">FARMASI</h1>
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl z-50 border-b border-slate-100 px-5 py-3 flex justify-between items-center shadow-sm">
+        <div>
+          <h1 className="text-lg font-black text-[#800020] tracking-tighter leading-tight">FARMASI</h1>
+          <p className="text-[7px] text-[#D4AF37] font-bold tracking-[0.2em] uppercase">Gestão</p>
+        </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors"
+          className="p-2 text-slate-600 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-white pt-20 px-4 animate-in fade-in slide-in-from-top-4 duration-200">
-          <nav className="space-y-2">
-            {navItems.map((item) => (
-              <NavItem
-                key={item.view}
-                {...item}
-                current={currentView}
-                onClick={(v) => {
-                  onChangeView(v);
-                  setIsMobileMenuOpen(false);
-                }}
-              />
-            ))}
-          </nav>
+        <div className="md:hidden fixed inset-0 z-40 bg-white/98 backdrop-blur-md pt-24 px-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex flex-col h-full">
+            <nav className="space-y-3 flex-1">
+              {navItems.map((item) => (
+                <NavItem
+                  key={item.view}
+                  {...item}
+                  current={currentView}
+                  onClick={(v) => {
+                    onChangeView(v);
+                    setIsMobileMenuOpen(false);
+                  }}
+                />
+              ))}
+            </nav>
+            <div className="pb-10 pt-6 border-t border-rose-50">
+              <button
+                onClick={() => supabase.auth.signOut()}
+                className="flex items-center gap-3 w-full px-5 py-4 rounded-2xl text-rose-500 bg-rose-50 font-bold text-sm transition-all"
+              >
+                <LogOut size={20} />
+                <span>Sair do Sistema</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Main Content */}
-      <main className="flex-1 h-full overflow-y-auto pt-16 md:pt-0 scroll-smooth">
+      <main className="flex-1 h-full overflow-y-auto pt-[60px] md:pt-0 scroll-smooth">
         <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-full">
           {children}
         </div>

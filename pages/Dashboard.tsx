@@ -110,11 +110,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
   };
 
   const QuickActionButton = ({ icon: Icon, label, onClick, bgColor, iconColor }: any) => (
-    <button onClick={onClick} className="flex flex-col items-center justify-center p-6 rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-sm border border-slate-100 bg-white group hover:border-[#800020]/20">
-      <div className={`${bgColor} p-5 rounded-2xl mb-3 shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] transition-transform group-hover:scale-110`}>
-        <Icon size={28} className={iconColor} />
+    <button onClick={onClick} className="flex flex-col items-center justify-center p-3 sm:p-6 rounded-2xl sm:rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-sm border border-slate-100 bg-white group hover:border-[#800020]/20">
+      <div className={`${bgColor} p-3 sm:p-5 rounded-2xl mb-2 sm:mb-3 shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] transition-transform group-hover:scale-110`}>
+        <Icon className={`${iconColor} w-5 h-5 sm:w-7 sm:h-7`} />
       </div>
-      <span className="font-bold text-[10px] text-slate-800 uppercase tracking-widest">{label}</span>
+      <span className="font-bold text-[8px] sm:text-[10px] text-slate-800 uppercase tracking-wider sm:tracking-widest text-center">{label}</span>
     </button>
   );
 
@@ -149,37 +149,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-        <div>
-          <h2 className="text-3xl md:text-5xl font-black text-slate-950 uppercase tracking-tighter leading-none">
-            FARMASI <span className="text-[#800020] italic block mt-2 text-2xl md:text-4xl">Sistema de Gestão</span>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+        <div className="w-full">
+          <h2 className="text-3xl md:text-5xl font-black text-slate-950 uppercase tracking-tighter leading-tight lg:leading-none">
+            FARMASI <span className="text-[#800020] italic block lg:mt-2 text-xl md:text-4xl">Sistema de Gestão</span>
           </h2>
-          <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-6 flex items-center gap-3">
+          <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-4 lg:mt-6 flex items-center gap-3">
             <Activity size={12} className="text-[#D4AF37]" /> Excelência em Gestão
           </p>
         </div>
 
-        <div className="flex flex-col items-end gap-3">
-          <div className="flex flex-wrap gap-4">
+        <div className="flex flex-col w-full lg:w-auto items-start lg:items-end gap-3">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx, .xls" onChange={handleFileImport} />
             <button
               disabled={isImporting}
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-3 bg-white text-slate-950 border-2 border-slate-950 px-6 py-4 rounded-2xl hover:bg-slate-50 transition-all text-[11px] font-black uppercase tracking-widest disabled:opacity-50"
+              className="flex items-center justify-center gap-3 bg-white text-slate-950 border-2 border-slate-950 px-6 py-4 rounded-2xl hover:bg-slate-50 transition-all text-[10px] sm:text-[11px] font-black uppercase tracking-widest disabled:opacity-50 w-full sm:w-auto"
             >
               <Upload size={18} /> Importar Estoque
             </button>
-            <button onClick={() => storage.exportToExcel(products)} className="flex items-center gap-3 bg-slate-950 text-white px-8 py-4 rounded-2xl hover:bg-black transition-all text-[11px] font-black uppercase tracking-widest shadow-xl">
+            <button onClick={() => storage.exportToExcel(products)} className="flex items-center justify-center gap-3 bg-slate-950 text-white px-8 py-4 rounded-2xl hover:bg-black transition-all text-[10px] sm:text-[11px] font-black uppercase tracking-widest shadow-xl w-full sm:w-auto">
               <Download size={18} /> Backup
             </button>
           </div>
-          <p className="text-[9px] font-bold text-slate-400 uppercase flex items-center gap-2">
+          <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase flex items-center gap-2 mt-1">
             <Info size={12} className="text-blue-400" /> Colunas: Código | Nome | Custo | Venda | Estoque
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
         <QuickActionButton icon={ShoppingCart} label="Vendas" onClick={() => onQuickAction('sales')} bgColor="bg-[#800020]/5" iconColor="text-[#800020]" />
         <QuickActionButton icon={Package} label="Estoque" onClick={() => onQuickAction('inventory')} bgColor="bg-emerald-50" iconColor="text-emerald-500" />
         <QuickActionButton icon={Handshake} label="Consignados" onClick={() => onQuickAction('consignments')} bgColor="bg-blue-50" iconColor="text-blue-500" />
@@ -187,23 +187,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
         <QuickActionButton icon={Users} label="Clientes" onClick={() => onQuickAction('clients')} bgColor="bg-violet-50" iconColor="text-violet-500" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
         <StatCard title="Faturamento" value={`R$ ${totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={DollarSign} color="violet" subtext="Receita acumulada" />
         <StatCard title="Lucro Real" value={`R$ ${totalProfit.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={TrendingUp} color="emerald" subtext="Resultado líquido" />
         <StatCard title="Consignado" value={`R$ ${consignedValue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={Handshake} color="blue" subtext="Mercadoria externa" />
         <StatCard title="Patrimônio" value={`R$ ${inventoryValue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={Package} color="amber" subtext="Valor em estoque" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-7 bg-white p-10 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 relative overflow-hidden">
-          <div className="flex justify-between items-center mb-16 relative z-10">
-            <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Relatório de Fluxo</h3>
-            <div className="bg-slate-50 px-4 py-2 rounded-full border border-slate-100 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
-              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Sincronizado</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+        <div className="lg:col-span-7 bg-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-10 sm:mb-16 relative z-10">
+            <h3 className="text-[9px] sm:text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Relatório de Fluxo</h3>
+            <div className="bg-slate-50 px-3 sm:py-2 rounded-full border border-slate-100 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#D4AF37] animate-pulse"></div>
+              <span className="text-[7px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Sincronizado</span>
             </div>
           </div>
-          <div className="h-96 w-full relative z-10">
+          <div className="h-64 sm:h-96 w-full relative z-10">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
@@ -213,47 +213,47 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#cbd5e1', fontSize: 9, fontWeight: 700 }} dy={15} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', fontWeight: 700, fontSize: '10px', textTransform: 'uppercase' }} />
-                <Area type="monotone" dataKey="value" stroke="#800020" strokeWidth={4} fillOpacity={1} fill="url(#colorVal)" dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#800020' }} activeDot={{ r: 6, fill: '#800020', strokeWidth: 0 }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#cbd5e1', fontSize: 8, fontWeight: 700 }} dy={10} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', fontWeight: 700, fontSize: '9px', textTransform: 'uppercase' }} />
+                <Area type="monotone" dataKey="value" stroke="#800020" strokeWidth={3} fillOpacity={1} fill="url(#colorVal)" dot={{ r: 3, fill: '#fff', strokeWidth: 1.5, stroke: '#800020' }} activeDot={{ r: 5, fill: '#800020', strokeWidth: 0 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="lg:col-span-5 bg-white p-10 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col h-full">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="p-4 bg-slate-50 text-[#D4AF37] rounded-2xl border border-slate-100">
-              <History size={24} />
+        <div className="lg:col-span-5 bg-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col h-full">
+          <div className="flex items-center gap-4 mb-8 sm:mb-10">
+            <div className="p-3 sm:p-4 bg-slate-50 text-[#D4AF37] rounded-2xl border border-slate-100">
+              <History className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Últimas Vendas</h3>
-              <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Feed em Tempo Real</p>
+              <h3 className="text-[9px] sm:text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Últimas Vendas</h3>
+              <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase mt-1 sm:mt-2 tracking-widest">Feed em Tempo Real</p>
             </div>
           </div>
 
-          <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar max-h-[450px]">
+          <div className="flex-1 space-y-3 sm:space-y-4 overflow-y-auto pr-2 custom-scrollbar max-h-[400px] sm:max-h-[450px]">
             {sales.slice().reverse().slice(0, 8).map(sale => (
-              <div key={sale.id} className="flex items-center justify-between p-5 bg-slate-50/50 rounded-2xl border border-slate-100/50 hover:border-[#800020]/20 transition-all group">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl transition-colors ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
-                    <ArrowUpRight size={18} />
+              <div key={sale.id} className="flex items-center justify-between p-4 sm:p-5 bg-slate-50/50 rounded-2xl border border-slate-100/50 hover:border-[#800020]/20 transition-all group">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className={`p-2.5 sm:p-3 rounded-xl transition-colors ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
+                    <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-bold text-slate-800 uppercase">{sale.items.length} {sale.items.length === 1 ? 'item' : 'itens'}</p>
-                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">{new Date(sale.date).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</p>
+                    <p className="text-[10px] sm:text-[11px] font-bold text-slate-800 uppercase">{sale.items.length} {sale.items.length === 1 ? 'item' : 'itens'}</p>
+                    <p className="text-[8px] sm:text-[9px] font-medium text-slate-400 uppercase tracking-tight">{new Date(sale.date).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-slate-900">R$ {sale.totalValue.toFixed(0)}</p>
-                  <p className={`text-[8px] font-bold uppercase px-2 py-0.5 rounded-full inline-block mt-1 ${sale.type === 'direct' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                  <p className="text-xs sm:text-sm font-bold text-slate-900">R$ {sale.totalValue.toFixed(0)}</p>
+                  <p className={`text-[7px] sm:text-[8px] font-bold uppercase px-2 py-0.5 rounded-full inline-block mt-0.5 sm:mt-1 ${sale.type === 'direct' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
                     {sale.type === 'direct' ? 'Estoque' : 'Salão'}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <button onClick={() => onViewChange('sales')} className="w-full mt-10 py-5 bg-[#800020] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">Ver Todas as Vendas</button>
+          <button onClick={() => onViewChange('sales')} className="w-full mt-8 sm:mt-10 py-4 sm:py-5 bg-[#800020] text-white rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">Ver Todas as Vendas</button>
         </div>
       </div>
     </div>
