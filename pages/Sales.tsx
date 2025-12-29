@@ -29,6 +29,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
   const [productSearch, setProductSearch] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [itemQuantity, setItemQuantity] = useState(1);
+  const [itemPrice, setItemPrice] = useState(0);
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
@@ -88,6 +89,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
 
   const handleSelectProduct = (p: Product) => {
     setSelectedProduct(p);
+    setItemPrice(p.sellPrice);
     setProductSearch('');
     setShowResults(false);
   };
@@ -112,7 +114,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       quantity: itemQuantity,
-      unitPrice: selectedProduct.sellPrice,
+      unitPrice: itemPrice,
       unitCost: selectedProduct.costPrice
     }]);
     setSelectedProduct(null);
@@ -275,13 +277,22 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                       <p className="text-[12px] sm:text-sm font-bold text-slate-900 uppercase tracking-tight line-clamp-1">{selectedProduct.name}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto">
+                    <div className="flex flex-col items-center">
+                      <span className="text-[8px] font-bold text-slate-400 uppercase mb-1">Preço</span>
+                      <div className="relative">
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">R$</span>
+                        <input type="number" step="0.01" className="w-20 sm:w-24 pl-7 pr-2 py-2 bg-slate-50 border border-slate-100 rounded-lg text-left font-bold text-sm outline-none focus:border-[#800020]/20" value={itemPrice} onChange={e => setItemPrice(Number(e.target.value))} />
+                      </div>
+                    </div>
                     <div className="flex flex-col items-center">
                       <span className="text-[8px] font-bold text-slate-400 uppercase mb-1">Qtd</span>
                       <input type="number" min="1" className="w-14 sm:w-16 p-2 bg-slate-50 border border-slate-100 rounded-lg text-center font-bold text-sm outline-none focus:border-[#800020]/20" value={itemQuantity} onChange={e => setItemQuantity(Number(e.target.value))} />
                     </div>
-                    <button type="button" onClick={addItem} className="bg-[#800020] text-white px-5 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md shadow-red-900/10 flex-1 sm:flex-none">Adicionar</button>
-                    <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] transition-colors p-1"><X size={20} /></button>
+                    <div className="flex items-end self-end sm:self-center">
+                      <button type="button" onClick={addItem} className="bg-[#800020] text-white px-5 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md shadow-red-900/10 flex-1 sm:flex-none">Adicionar</button>
+                    </div>
+                    <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] transition-colors p-1 self-center"><X size={20} /></button>
                   </div>
                 </div>
               ) : (
