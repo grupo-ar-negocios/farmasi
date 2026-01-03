@@ -15,6 +15,9 @@ interface SalonsProps {
 }
 
 export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, onDelete, onPayCommission, startOpen }) => {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingSalon, setEditingSalon] = useState<Salon | null>(null);
+  const [formData, setFormData] = useState<Partial<Salon>>({});
   const [isExtratoModalOpen, setIsExtratoModalOpen] = useState(false);
   const [selectedSalonId, setSelectedSalonId] = useState<string | null>(null);
 
