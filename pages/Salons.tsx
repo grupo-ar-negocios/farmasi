@@ -15,9 +15,8 @@ interface SalonsProps {
 }
 
 export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, onDelete, onPayCommission, startOpen }) => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingSalon, setEditingSalon] = useState<Salon | null>(null);
-  const [formData, setFormData] = useState<Partial<Salon>>({});
+  const [isExtratoModalOpen, setIsExtratoModalOpen] = useState(false);
+  const [selectedSalonId, setSelectedSalonId] = useState<string | null>(null);
 
   useEffect(() => {
     if (startOpen) handleOpenAdd();
@@ -33,6 +32,11 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, on
     setEditingSalon(salon);
     setFormData(salon);
     setIsAddModalOpen(true);
+  };
+
+  const handleOpenExtrato = (salonId: string) => {
+    setSelectedSalonId(salonId);
+    setIsExtratoModalOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -55,6 +59,9 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, on
   };
 
   const getPendingSales = (salonId: string) => sales.filter(s => s.type === 'consignment' && String(s.originSalonId) === String(salonId) && !s.commissionPaid);
+
+  const selectedSalon = salons.find(s => s.id === selectedSalonId);
+  const pendingSalesForModal = selectedSalonId ? getPendingSales(selectedSalonId) : [];
 
   return (
     <div className="space-y-6 pb-20 sm:pb-0">
@@ -96,7 +103,7 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, on
                   </div>
                   <span className="text-[8px] sm:text-[9px] font-bold text-[#800020] bg-white border border-red-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full tracking-tighter shrink-0">{salon.commissionRate}%</span>
                 </div>
-                <button disabled={commissionValue <= 0} className={`w-full py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all relative z-10 ${commissionValue > 0 ? 'bg-[#800020] text-white hover:bg-[#600018] shadow-md shadow-red-900/5' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+                <button onClick={() => handleOpenExtrato(salon.id)} disabled={commissionValue <= 0} className={`w-full py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all relative z-10 ${commissionValue > 0 ? 'bg-[#800020] text-white hover:bg-[#600018] shadow-md shadow-red-900/5' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
                   <FileText size={16} /> Extrato
                 </button>
               </div>
@@ -133,6 +140,50 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, on
             Confirmar Registro
           </button>
         </form>
+      </Modal>
+
+      <Modal isOpen={isExtratoModalOpen} onClose={() => setIsExtratoModalOpen(false)} title={`Extrato: ${selectedSalon?.name}`}>
+        <div className="space-y-6">
+          <div className="max-h-[400px] overflow-y-auto custom-scrollbar space-y-3">
+            {pendingSalesForModal.map(sale => (
+              <div key={sale.id} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{new Date(sale.date).toLocaleDateString()}</span>
+                  <span className="text-xs font-black text-slate-950">R$ {sale.totalValue.toFixed(2)}</span>
+                </div>
+                <div className="space-y-1">
+                  {sale.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-[10px] font-bold text-slate-600 uppercase">
+                      <span>{item.quantity}x {item.productName}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 pt-2 border-t border-slate-200 flex justify-between items-center">
+                  <span className="text-[9px] font-black text-slate-400 uppercase">Comissão ({selectedSalon?.commissionRate}%):</span>
+                  <span className="text-[10px] font-black text-[#800020]">R$ {((sale.totalValue * (selectedSalon?.commissionRate || 0)) / 100).toFixed(2)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total à Pagar</p>
+              <p className="text-2xl font-black text-slate-950">R$ {((pendingSalesForModal.reduce((acc, s) => acc + s.totalValue, 0) * (selectedSalon?.commissionRate || 0)) / 100).toFixed(2)}</p>
+            </div>
+            <button
+              onClick={() => {
+                if (selectedSalonId && confirm("Marcar todas estas vendas como pagas?")) {
+                  onPayCommission(selectedSalonId, pendingSalesForModal.map(s => s.id));
+                  setIsExtratoModalOpen(false);
+                }
+              }}
+              className="bg-[#800020] text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#600018] transition-all"
+            >
+              Marcar como Pago
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

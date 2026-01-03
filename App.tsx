@@ -177,17 +177,36 @@ function App() {
 
     if (saleToDelete) {
       try {
-        // Reverte o estoque dos produtos da venda no Supabase
+        // Reverte o estoque dos produtos e consignações
         for (const item of saleToDelete.items) {
           const product = products.find(p => p.id === item.productId);
           if (product) {
             const updatedProduct = { ...product };
             if (saleToDelete.type === 'direct') {
               updatedProduct.stockQuantity += item.quantity;
+              await supabaseService.updateProduct(updatedProduct);
             } else if (saleToDelete.type === 'consignment' && saleToDelete.originSalonId) {
               updatedProduct.consignedQuantity += item.quantity;
+              await supabaseService.updateProduct(updatedProduct);
+
+              // Reverte soldQuantity na consignação (FIFO invertido - LIFO para reversão simplificada)
+              const relevantConsignments = consignments
+                .filter(c => String(c.salonId) === String(saleToDelete.originSalonId) && String(c.productId) === String(item.productId))
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+              let remainingToRevert = item.quantity;
+              for (const consignment of relevantConsignments) {
+                if (remainingToRevert <= 0) break;
+                const revertAmount = Math.min(remainingToRevert, consignment.soldQuantity);
+                if (revertAmount > 0) {
+                  await supabaseService.updateConsignment({
+                    ...consignment,
+                    soldQuantity: consignment.soldQuantity - revertAmount
+                  });
+                  remainingToRevert -= revertAmount;
+                }
+              }
             }
-            await supabaseService.updateProduct(updatedProduct);
           }
         }
 
@@ -238,17 +257,44 @@ function App() {
       // 1. Criar a venda e itens
       await supabaseService.createSale(sale);
 
-      // 2. Atualizar estoque (Ideal seria em lote ou trigger no banco)
+      // 2. Atualizar estoque e consignações
       const updates = sale.items.map(async (item) => {
         const product = products.find(p => p.id === item.productId);
         if (product) {
           const updatedProduct = { ...product };
           if (sale.type === 'direct') {
             updatedProduct.stockQuantity -= item.quantity;
+            return supabaseService.updateProduct(updatedProduct);
           } else if (sale.type === 'consignment' && sale.originSalonId) {
             updatedProduct.consignedQuantity -= item.quantity;
+
+            // Atualiza soldQuantity na consignação
+            const relevantConsignments = consignments
+              .filter(c => String(c.salonId) === String(sale.originSalonId) && String(c.productId) === String(item.productId) && c.status === 'active')
+              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+            let remainingToUpdate = item.quantity;
+            const consignmentUpdates = [];
+
+            for (const consignment of relevantConsignments) {
+              if (remainingToUpdate <= 0) break;
+              const availableInConsignment = consignment.quantity - consignment.soldQuantity - consignment.returnedQuantity;
+              const updateAmount = Math.min(remainingToUpdate, availableInConsignment);
+
+              if (updateAmount > 0) {
+                consignmentUpdates.push(supabaseService.updateConsignment({
+                  ...consignment,
+                  soldQuantity: consignment.soldQuantity + updateAmount
+                }));
+                remainingToUpdate -= updateAmount;
+              }
+            }
+
+            return Promise.all([
+              supabaseService.updateProduct(updatedProduct),
+              ...consignmentUpdates
+            ]);
           }
-          return supabaseService.updateProduct(updatedProduct);
         }
       });
 
@@ -325,6 +371,22 @@ function App() {
     }
   };
 
+  const handlePayCommission = async (salonId: string, salesIdsToPay: string[]) => {
+    try {
+      const updates = salesIdsToPay.map(id => {
+        const sale = sales.find(s => s.id === id);
+        if (sale) {
+          return supabaseService.updateSale({ ...sale, commissionPaid: true });
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(updates);
+      refreshData();
+    } catch (e) {
+      console.error("Erro ao pagar comissão", e);
+    }
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -354,7 +416,7 @@ function App() {
       case 'consignments':
         return <Consignments consignments={consignments} salons={salons} products={products} onAdd={handleAddConsignment} onEdit={() => { }} onDelete={handleDeleteConsignment} startOpen={autoOpenModal} />;
       case 'salons':
-        return <Salons salons={salons} sales={sales} onAdd={handleAddSalon} onEdit={handleEditSalon} onDelete={handleDeleteSalon} onPayCommission={() => { }} startOpen={autoOpenModal} />;
+        return <Salons salons={salons} sales={sales} onAdd={handleAddSalon} onEdit={handleEditSalon} onDelete={handleDeleteSalon} onPayCommission={handlePayCommission} startOpen={autoOpenModal} />;
       case 'clients':
         return <Clients clients={clients} sales={sales} onAdd={handleAddClient} onEdit={handleEditClient} onDelete={handleDeleteClient} startOpen={autoOpenModal} />;
       case 'reports':

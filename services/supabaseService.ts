@@ -193,6 +193,22 @@ export const supabaseService = {
         return data as Consignment;
     },
 
+    updateConsignment: async (consignment: Consignment) => {
+        const { error } = await supabase
+            .from('consignments')
+            .update({
+                salon_id: consignment.salonId,
+                product_id: consignment.productId,
+                quantity: consignment.quantity,
+                sold_quantity: consignment.soldQuantity,
+                returned_quantity: consignment.returnedQuantity,
+                status: consignment.status,
+                date: consignment.date
+            })
+            .eq('id', consignment.id);
+        if (error) throw error;
+    },
+
     deleteConsignment: async (id: string) => {
         const { error } = await supabase.from('consignments').delete().eq('id', id);
         if (error) throw error;
@@ -258,6 +274,23 @@ export const supabaseService = {
         if (itemsError) throw itemsError;
 
         return { ...sale, id: saleData.id } as Sale;
+    },
+
+    updateSale: async (sale: Sale) => {
+        const { error } = await supabase
+            .from('sales')
+            .update({
+                date: sale.date,
+                client_id: sale.clientId,
+                total_value: sale.totalValue,
+                total_cost: sale.totalCost,
+                payment_method: sale.paymentMethod,
+                type: sale.type,
+                origin_salon_id: sale.originSalonId,
+                commission_paid: sale.commissionPaid
+            })
+            .eq('id', sale.id);
+        if (error) throw error;
     },
 
     deleteSale: async (id: string) => {
