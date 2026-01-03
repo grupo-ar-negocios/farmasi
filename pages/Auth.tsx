@@ -42,13 +42,13 @@ export function Auth() {
                 <div className="bg-white/70 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(255,180,190,0.2)] border border-white/50 relative overflow-hidden">
                     {/* Logo Section */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-rose-500 rounded-2xl shadow-lg shadow-rose-200 mb-6 rotate-3">
-                            <Sparkles className="text-white w-8 h-8" />
+                        <div className="flex justify-center mb-6">
+                            <img
+                                src="/logo.png"
+                                alt="FARMASI Logo"
+                                className="w-48 h-48 object-contain drop-shadow-xl"
+                            />
                         </div>
-                        <h1 className="text-3xl font-black text-slate-950 uppercase tracking-tighter">
-                            FARMASI
-                        </h1>
-                        <p className="text-[10px] text-slate-400 font-bold tracking-[0.3em] mt-2">SISTEMA DE GESTÃO</p>
                     </div>
 
                     <form onSubmit={handleAuth} className="space-y-6">

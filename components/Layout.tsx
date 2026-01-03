@@ -68,11 +68,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
     <div className="flex h-screen bg-[#fffafb] overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-100 h-full p-6 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-        <div className="mb-10">
-          <h1 className="text-3xl font-black text-[#800020] tracking-tighter leading-none">
-            FARMASI
-          </h1>
-          <p className="text-[9px] text-[#D4AF37] font-bold tracking-[0.4em] mt-2 uppercase">Sistema de Gestão</p>
+        <div className="mb-10 flex justify-center">
+          <img src="/logo.png" alt="FARMASI Logo" className="w-32 h-32 object-contain" />
         </div>
         <nav className="flex-1 space-y-1">
           {navItems.map((item) => (
@@ -98,9 +95,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
 
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl z-50 border-b border-slate-100 px-5 py-3 flex justify-between items-center shadow-sm">
-        <div>
-          <h1 className="text-lg font-black text-[#800020] tracking-tighter leading-tight">FARMASI</h1>
-          <p className="text-[7px] text-[#D4AF37] font-bold tracking-[0.2em] uppercase">Gestão</p>
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="FARMASI" className="w-10 h-10 object-contain" />
+          <span className="text-lg font-black text-[#800020] tracking-tighter">FARMASI</span>
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
