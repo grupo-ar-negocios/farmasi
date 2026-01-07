@@ -64,10 +64,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
   const chartDataMap = new Map<string, number>();
   sales.forEach(sale => {
-    const date = new Date(sale.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    chartDataMap.set(date, (chartDataMap.get(date) || 0) + sale.totalValue);
+    const dateKey = new Date(sale.date).toISOString().split('T')[0];
+    chartDataMap.set(dateKey, (chartDataMap.get(dateKey) || 0) + sale.totalValue);
   });
-  const chartData = Array.from(chartDataMap.entries()).map(([name, value]) => ({ name, value })).sort((a, b) => a.name.localeCompare(b.name)).slice(-10);
+  const chartData = Array.from(chartDataMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .slice(-10)
+    .map(([date, value]) => ({
+      name: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+      value
+    }));
 
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -233,7 +239,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
           </div>
 
           <div className="flex-1 space-y-3 sm:space-y-4 overflow-y-auto pr-2 custom-scrollbar max-h-[400px] sm:max-h-[450px]">
-            {sales.slice().reverse().slice(0, 8).map(sale => (
+            {sales.slice(0, 8).map(sale => (
               <div key={sale.id} className="flex items-center justify-between p-4 sm:p-5 bg-slate-50/50 rounded-2xl border border-slate-100/50 hover:border-[#800020]/20 transition-all group">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className={`p-2.5 sm:p-3 rounded-xl transition-colors ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>

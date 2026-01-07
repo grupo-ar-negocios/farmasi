@@ -194,7 +194,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {sales.slice().reverse().map(sale => (
+              {sales.map(sale => (
                 <tr key={sale.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-[11px] sm:text-xs font-bold text-slate-900 whitespace-nowrap">{new Date(sale.date).toLocaleDateString()}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-tight whitespace-nowrap">{clients.find(c => String(c.id) === String(sale.clientId))?.name || 'Balcão'}</td>
