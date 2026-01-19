@@ -62,10 +62,10 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
     const term = searchTerm.toLowerCase();
     if (!term) return consignments;
     return consignments.filter(c => {
-      const salon = salons.find(s => String(s.id) === String(c.salonId));
-      return salon?.name.toLowerCase().includes(term);
+      const product = products.find(p => String(p.id) === String(c.productId));
+      return product?.name.toLowerCase().includes(term);
     });
-  }, [consignments, salons, searchTerm]);
+  }, [consignments, products, searchTerm]);
 
   const handleSelectProduct = (p: Product) => {
     setSelectedProduct(p);
@@ -110,7 +110,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
             <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
             <input
               type="text"
-              placeholder="Filtro por salão..."
+              placeholder="Filtro por produto..."
               className="outline-none placeholder:text-slate-300 text-slate-900 flex-1 sm:w-48 bg-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
