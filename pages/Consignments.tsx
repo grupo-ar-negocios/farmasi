@@ -55,7 +55,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
     return products.filter(p =>
       p.name.toLowerCase().includes(term) ||
       p.code.toLowerCase().includes(term)
-    ).slice(0, 5);
+    ).slice(0, 10);
   }, [products, productSearch]);
 
   const filteredConsignments = useMemo(() => {

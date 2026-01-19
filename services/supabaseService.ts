@@ -277,7 +277,8 @@ export const supabaseService = {
     },
 
     updateSale: async (sale: Sale) => {
-        const { error } = await supabase
+        // 1. Update the parent sale record
+        const { error: saleError } = await supabase
             .from('sales')
             .update({
                 date: sale.date,
@@ -290,7 +291,29 @@ export const supabaseService = {
                 commission_paid: sale.commissionPaid
             })
             .eq('id', sale.id);
-        if (error) throw error;
+
+        if (saleError) throw saleError;
+
+        // 2. Delete existing items for this sale
+        const { error: deleteError } = await supabase
+            .from('sale_items')
+            .delete()
+            .eq('sale_id', sale.id);
+
+        if (deleteError) throw deleteError;
+
+        // 3. Insert the updated items
+        const itemsToInsert = sale.items.map(item => ({
+            sale_id: sale.id,
+            product_id: item.productId,
+            product_name: item.productName,
+            quantity: item.quantity,
+            unit_price: item.unitPrice,
+            unit_cost: item.unitCost
+        }));
+
+        const { error: itemsError } = await supabase.from('sale_items').insert(itemsToInsert);
+        if (itemsError) throw itemsError;
     },
 
     deleteSale: async (id: string) => {

@@ -79,12 +79,12 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
     const term = productSearch.toLowerCase();
     // Mostra primeiros 5 produtos se não houver busca, ou filtra pela busca
     if (!term) {
-      return baseAvailableProducts.slice(0, 5);
+      return baseAvailableProducts.slice(0, 10);
     }
     return baseAvailableProducts.filter(p =>
       p.name.toLowerCase().includes(term) ||
       p.code.toLowerCase().includes(term)
-    ).slice(0, 5); // Limita a 5 resultados para ficar limpo
+    ).slice(0, 10); // Limita a 10 resultados para ficar limpo
   }, [baseAvailableProducts, productSearch]);
 
   const handleSelectProduct = (p: Product) => {
