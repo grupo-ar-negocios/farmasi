@@ -36,22 +36,13 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
     if (startOpen) openModal();
   }, [startOpen]);
 
-  const openModal = (sale?: Sale) => {
-    if (sale) {
-      setEditingSale(sale);
-      setItems(sale.items);
-      setSelectedClientId(sale.clientId);
-      setPaymentMethod(sale.paymentMethod);
-      setSaleType(sale.type);
-      setOriginSalonId(sale.originSalonId || '');
-    } else {
-      setEditingSale(null);
-      setItems([]);
-      setSelectedClientId('');
-      setPaymentMethod('cash');
-      setSaleType('direct');
-      setOriginSalonId('');
-    }
+  const openModal = () => {
+    setEditingSale(null);
+    setItems([]);
+    setSelectedClientId('');
+    setPaymentMethod('cash');
+    setSaleType('direct');
+    setOriginSalonId('');
     setProductSearch('');
     setSelectedProduct(null);
     setIsModalOpen(true);
@@ -146,7 +137,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
     }
 
     const baseSaleData = {
-      date: editingSale ? editingSale.date : new Date().toISOString(),
+      date: new Date().toISOString(),
       clientId: selectedClientId || null,
       items: items,
       totalValue: calculateTotal(),
@@ -154,18 +145,10 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
       paymentMethod,
       type: saleType,
       originSalonId: saleType === 'consignment' ? originSalonId : undefined,
-      commissionPaid: editingSale ? editingSale.commissionPaid : false
+      commissionPaid: false
     };
 
-    if (editingSale) {
-      const updatedSale: Sale = {
-        ...baseSaleData,
-        id: editingSale.id,
-      } as Sale;
-      onEditSale(updatedSale);
-    } else {
-      onAddSale(baseSaleData as Omit<Sale, 'id'>);
-    }
+    onAddSale(baseSaleData as Omit<Sale, 'id'>);
     closeModal();
   };
 
@@ -216,7 +199,6 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-[13px] sm:text-sm text-slate-950 whitespace-nowrap">R$ {sale.totalValue.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
                     <div className="flex justify-center gap-1 sm:gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openModal(sale)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Edit2 size={16} /></button>
                       <button onClick={() => { if (confirm("Confirmar exclusão desta venda?")) onDelete(sale.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
                     </div>
                   </td>
@@ -227,7 +209,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingSale ? "Editar Venda" : "Nova Venda"}>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title="Nova Venda">
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             <div className="space-y-4">
@@ -371,7 +353,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
               <span className="font-black text-3xl sm:text-5xl text-slate-950 tracking-tighter leading-none">R$ {calculateTotal().toFixed(2)}</span>
             </div>
             <button type="submit" className="bg-[#800020] text-white px-10 sm:px-14 py-4 sm:py-6 rounded-2xl sm:rounded-3xl font-black uppercase tracking-[0.2em] text-[10px] sm:text-[11px] hover:bg-[#600018] shadow-xl shadow-red-900/20 transition-all hover:-translate-y-1 w-full sm:w-auto">
-              {editingSale ? 'Atualizar' : 'Finalizar'}
+              Finalizar
             </button>
           </div>
         </form>
