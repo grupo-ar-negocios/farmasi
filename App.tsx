@@ -156,21 +156,35 @@ function App() {
     setAutoOpenModal(true);
   };
 
-  const executeDeletion = async (type: 'products' | 'clients' | 'salons' | 'sales' | 'consignments', id: string) => {
-    try {
-      if (type === 'products') await supabaseService.deleteProduct(id);
-      if (type === 'clients') await supabaseService.deleteClient(id);
-      if (type === 'salons') await supabaseService.deleteSalon(id);
-      if (type === 'sales') await supabaseService.deleteSale(id);
-      if (type === 'consignments') await supabaseService.deleteConsignment(id);
-
-      refreshData();
-    } catch (err) {
-      console.error(`Erro ao deletar ${type}:`, err);
+  const handleDeleteProduct = (id: string) => {
+    if (confirm("Deseja realmente excluir este produto?")) {
+      supabaseService.deleteProduct(id).then(() => refreshData());
     }
   };
 
-  const handleDeleteProduct = (id: string) => executeDeletion('products', id);
+  const handleDeleteConsignment = async (id: string) => {
+    const consignmentToDelete = consignments.find(c => String(c.id) === String(id));
+
+    if (consignmentToDelete) {
+      try {
+        const product = products.find(p => p.id === consignmentToDelete.productId);
+        const remainingQuantity = consignmentToDelete.quantity - consignmentToDelete.soldQuantity - consignmentToDelete.returnedQuantity;
+
+        if (product && remainingQuantity > 0) {
+          await supabaseService.updateProduct({
+            ...product,
+            stockQuantity: product.stockQuantity + remainingQuantity,
+            consignedQuantity: product.consignedQuantity - remainingQuantity
+          });
+        }
+
+        await supabaseService.deleteConsignment(id);
+        refreshData();
+      } catch (err) {
+        console.error("Erro ao deletar consignação e reverter estoque:", err);
+      }
+    }
+  };
 
   const handleDeleteSale = async (id: string) => {
     const saleToDelete = sales.find(s => String(s.id) === String(id));
@@ -218,9 +232,16 @@ function App() {
     }
   };
 
-  const handleDeleteSalon = (id: string) => executeDeletion('salons', id);
-  const handleDeleteClient = (id: string) => executeDeletion('clients', id);
-  const handleDeleteConsignment = (id: string) => executeDeletion('consignments', id);
+  const handleDeleteSalon = (id: string) => {
+    if (confirm("Deseja realmente excluir este salão?")) {
+      supabaseService.deleteSalon(id).then(() => refreshData());
+    }
+  };
+  const handleDeleteClient = (id: string) => {
+    if (confirm("Deseja realmente excluir este cliente?")) {
+      supabaseService.deleteClient(id).then(() => refreshData());
+    }
+  };
 
   const handleImportProducts = async (newProducts: Product[]) => {
     try {
