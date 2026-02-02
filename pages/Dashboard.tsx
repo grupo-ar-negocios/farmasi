@@ -18,7 +18,9 @@ import {
   Info,
   CheckCircle2,
   AlertCircle,
-  Loader2
+  Loader2,
+  Target,
+  BarChart3
 } from 'lucide-react';
 import { storage } from '../services/storage';
 import {
@@ -61,6 +63,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
   const inventoryValue = products.reduce((acc, p) => acc + (p.stockQuantity * p.costPrice), 0);
   const consignedValue = products.reduce((acc, p) => acc + (p.consignedQuantity * p.costPrice), 0);
+  const potentialStockValue = products.reduce((acc, p) => acc + (p.stockQuantity * p.sellPrice), 0);
+  const potentialTotalValue = products.reduce((acc, p) => acc + ((p.stockQuantity + p.consignedQuantity) * p.sellPrice), 0);
 
   const chartDataMap = new Map<string, number>();
   sales.forEach(sale => {
@@ -193,11 +197,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
         <QuickActionButton icon={Users} label="Clientes" onClick={() => onQuickAction('clients')} bgColor="bg-violet-50" iconColor="text-violet-500" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
         <StatCard title="Faturamento" value={`R$ ${totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={DollarSign} color="violet" subtext="Receita acumulada" />
         <StatCard title="Lucro Real" value={`R$ ${totalProfit.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={TrendingUp} color="emerald" subtext="Resultado líquido" />
         <StatCard title="Consignado" value={`R$ ${consignedValue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={Handshake} color="blue" subtext="Mercadoria externa" />
         <StatCard title="Patrimônio" value={`R$ ${inventoryValue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={Package} color="amber" subtext="Valor em estoque" />
+        <StatCard title="Venda (Estoque)" value={`R$ ${potentialStockValue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={Target} color="rose" subtext="Potencial estoque central" />
+        <StatCard title="Venda (Global)" value={`R$ ${potentialTotalValue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`} icon={BarChart3} color="indigo" subtext="Estoque + Consignado" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
