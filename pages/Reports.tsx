@@ -58,12 +58,18 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
   const topProducts = useMemo(() => {
     const map = new Map<string, { name: string, qty: number, revenue: number }>();
     sales.forEach(sale => {
+      // Calculate the sum of item components to find the ratio
+      const totalItemsValue = sale.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+      const ratio = totalItemsValue > 0 ? sale.totalValue / totalItemsValue : 0;
+
       sale.items.forEach(item => {
         const existing = map.get(item.productId) || { name: item.productName, qty: 0, revenue: 0 };
+        const itemTrueRevenue = (item.quantity * item.unitPrice) * ratio;
+
         map.set(item.productId, {
           name: item.productName,
           qty: existing.qty + item.quantity,
-          revenue: existing.revenue + (item.quantity * item.unitPrice)
+          revenue: existing.revenue + itemTrueRevenue
         });
       });
     });
