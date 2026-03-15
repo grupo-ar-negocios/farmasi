@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Product, Client } from '../types';
 import { Plus, Search, Package, Trash2, Edit2 } from 'lucide-react';
 import { Modal } from '../components/Modal';
+import { normalizeString } from '../services/utils';
 
 interface InventoryProps {
   products: Product[];
@@ -61,8 +62,8 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
   };
 
   const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.code.toLowerCase().includes(searchTerm.toLowerCase())
+    normalizeString(p.name).includes(normalizeString(searchTerm)) ||
+    normalizeString(p.code).includes(normalizeString(searchTerm))
   );
 
   return (

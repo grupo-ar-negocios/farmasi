@@ -101,14 +101,41 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
     ].filter(d => d.value > 0);
   }, [sales]);
 
-  // Time Series Data
+  // Time Series Data (Last 15 days of activity)
   const chartData = useMemo(() => {
     const dataMap = new Map<string, number>();
     sales.forEach(sale => {
-      const date = new Date(sale.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const date = new Date(sale.date).toISOString().split('T')[0];
       dataMap.set(date, (dataMap.get(date) || 0) + sale.totalValue);
     });
-    return Array.from(dataMap.entries()).map(([name, value]) => ({ name, value })).sort((a, b) => a.name.localeCompare(b.name)).slice(-15);
+
+    return Array.from(dataMap.entries())
+      .map(([date, value]) => ({
+        date,
+        name: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        value
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-15);
+  }, [sales]);
+
+  // Weekly Performance Data (Last 7 days, including zero days)
+  const weeklyChartData = useMemo(() => {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return d.toISOString().split('T')[0];
+    });
+
+    return last7Days.map(date => {
+      const daySales = sales.filter(s => s.date.startsWith(date));
+      const value = daySales.reduce((acc, s) => acc + s.totalValue, 0);
+      return {
+        name: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short' }),
+        fullDate: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        value
+      };
+    });
   }, [sales]);
 
   return (
@@ -134,6 +161,32 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+        {/* Weekly Performance Bar Chart */}
+        <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm flex flex-col">
+          <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-8 sm:mb-12">Desempenho Semanal</h3>
+          <div className="h-48 sm:h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={weeklyChartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 900 }} dy={10} />
+                <Tooltip
+                  cursor={{ fill: '#f8fafc' }}
+                  contentStyle={{ borderRadius: '15px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', fontWeight: 900, fontSize: '10px' }}
+                  labelStyle={{ color: '#800020' }}
+                />
+                <Bar dataKey="value" fill="#800020" radius={[4, 4, 0, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-auto pt-6 flex justify-between items-end">
+            <div>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Total 7 Dias</p>
+              <p className="text-lg font-black text-slate-950">R$ {weeklyChartData.reduce((acc, d) => acc + d.value, 0).toLocaleString()}</p>
+            </div>
+            <div className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-[9px] font-black uppercase">Atualizado</div>
+          </div>
+        </div>
+
         {/* Main Revenue Chart */}
         <div className="lg:col-span-8 bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm">
           <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-8 sm:mb-12">Evolução de Faturamento</h3>
@@ -154,7 +207,9 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
         {/* Payment Methods */}
         <div className="lg:col-span-4 bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm flex flex-col items-center">
           <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-6 sm:mb-8 w-full">Meios de Pagamento</h3>
@@ -173,14 +228,12 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
               <PieChartIcon className="text-slate-100" size={24} />
             </div>
           </div>
-          <div className="w-full mt-4 sm:mt-6 space-y-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full mt-4 sm:mt-6">
             {paymentMethodsData.map(method => (
-              <div key={method.name} className="flex items-center justify-between text-[9px] sm:text-[10px] font-black uppercase">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: method.color }}></div>
-                  <span className="text-slate-500">{method.name}</span>
-                </div>
-                <span className="text-slate-950">R$ {method.value.toLocaleString()}</span>
+              <div key={method.name} className="flex flex-col items-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="w-2 h-2 rounded-full mb-2" style={{ backgroundColor: method.color }}></div>
+                <span className="text-slate-500 text-[8px] font-black uppercase mb-1">{method.name}</span>
+                <span className="text-slate-950 text-[10px] font-black">R$ {method.value.toLocaleString()}</span>
               </div>
             ))}
           </div>

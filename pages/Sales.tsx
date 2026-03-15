@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sale, Product, Client, Salon, SaleItem, Consignment } from '../types';
 import { ShoppingCart, Plus, Trash2, Edit2, Package, X, Search, CheckCircle2 } from 'lucide-react';
 import { Modal } from '../components/Modal';
+import { normalizeString } from '../services/utils';
 
 interface SalesProps {
   sales: Sale[];
@@ -67,14 +68,14 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
   }, [saleType, originSalonId, products, consignments]);
 
   const filteredProducts = useMemo(() => {
-    const term = productSearch.toLowerCase();
+    const term = normalizeString(productSearch);
     // Mostra primeiros 5 produtos se não houver busca, ou filtra pela busca
     if (!term) {
       return baseAvailableProducts.slice(0, 10);
     }
     return baseAvailableProducts.filter(p =>
-      p.name.toLowerCase().includes(term) ||
-      p.code.toLowerCase().includes(term)
+      normalizeString(p.name).includes(term) ||
+      normalizeString(p.code).includes(term)
     ).slice(0, 10); // Limita a 10 resultados para ficar limpo
   }, [baseAvailableProducts, productSearch]);
 
