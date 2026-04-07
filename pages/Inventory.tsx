@@ -97,6 +97,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
                 <th className="px-5 sm:px-8 py-4 sm:py-6">Designação</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6 text-center">Central</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6 text-center">Consig</th>
+                <th className="px-5 sm:px-8 py-4 sm:py-6 text-right">Compra</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6 text-right">Venda</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6 text-center">Ações</th>
               </tr>
@@ -114,6 +115,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center font-bold text-slate-900 text-xs">
                     <span className="bg-blue-50/50 text-blue-600 px-3 sm:px-4 py-1.5 rounded-full uppercase text-[9px] sm:text-[10px]">{product.consignedQuantity} un</span>
                   </td>
+                  <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-slate-500 text-xs sm:text-sm whitespace-nowrap">R$ {product.costPrice.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-slate-950 text-xs sm:text-sm whitespace-nowrap">R$ {product.sellPrice.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
                     <div className="flex justify-center gap-1 sm:gap-3 opacity-100 sm:opacity-20 group-hover:opacity-100 transition-opacity">
