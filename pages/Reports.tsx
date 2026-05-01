@@ -144,7 +144,7 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
         <div>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-950 uppercase tracking-tighter">Relatórios <span className="text-[#800020] italic">Estratégicos</span></h2>
           <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] sm:tracking-[0.4em] mt-2 flex items-center gap-2">
-            <Target size={14} className="text-[#800020]" /> Inteligência FARMASI
+            <Target size={14} className="text-[#800020]" /> Inteligência FLUXO BEAUTY
           </p>
         </div>
         <div className="bg-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-[#800020]/10 flex items-center gap-3">

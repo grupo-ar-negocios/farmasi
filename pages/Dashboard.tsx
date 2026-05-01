@@ -137,7 +137,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
           <div className="w-full max-w-md space-y-8 text-center animate-in zoom-in duration-300">
             <Loader2 size={64} className="mx-auto text-[#D4AF37] animate-spin mb-4" />
             <h2 className="text-3xl font-black uppercase tracking-tighter">Processando Planilha</h2>
-            <p className="text-slate-400 font-bold uppercase text-[9px] tracking-[0.4em]">Sincronizando dados com o sistema FARMASI...</p>
+            <p className="text-slate-400 font-bold uppercase text-[9px] tracking-[0.4em]">Sincronizando dados com o sistema FLUXO BEAUTY...</p>
 
             <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
               <div
@@ -162,7 +162,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
         <div className="w-full">
           <h2 className="text-3xl md:text-5xl font-black text-slate-950 uppercase tracking-tighter leading-tight lg:leading-none">
-            FARMASI <span className="text-[#800020] italic block lg:mt-2 text-xl md:text-4xl">Sistema de Gestão</span>
+            FLUXO BEAUTY <span className="text-[#800020] italic block lg:mt-2 text-xl md:text-4xl">Sistema de Gestão</span>
           </h2>
           <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-4 lg:mt-6 flex items-center gap-3">
             <Activity size={12} className="text-[#D4AF37]" /> Excelência em Gestão

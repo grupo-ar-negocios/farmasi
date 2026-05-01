@@ -130,7 +130,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingProduct ? "Propriedades do Produto" : "Novo Cadastro FARMASI"}>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingProduct ? "Propriedades do Produto" : "Novo Cadastro FLUXO BEAUTY"}>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Código Identificador</label>

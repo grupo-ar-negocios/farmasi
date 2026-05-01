@@ -34,9 +34,9 @@ Deno.serve(async (req) => {
                 "Authorization": `Bearer ${resendKey}`,
             },
             body: JSON.stringify({
-                from: "FARMASI <onboarding@resend.dev>",
-                to: [adminEmail],
-                subject: "Novo Cadastro Pendente - FARMASI",
+                from: "FLUXO BEAUTY <onboarding@resend.dev>",
+                to: ["daniel.kbinho@gmail.com"],
+                subject: "Novo Cadastro Pendente - FLUXO BEAUTY",
                 html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f1f5f9; border-radius: 20px;">
             <h1 style="color: #800020; text-transform: uppercase; letter-spacing: -1px;">Novo Cadastro</h1>
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
               </a>
             </p>
             <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 30px 0;">
-            <p style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px;">SISTEMA DE GESTÃO FARMASI</p>
+            <p style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px;">SISTEMA DE GESTÃO FLUXO BEAUTY</p>
           </div>
         `,
             }),

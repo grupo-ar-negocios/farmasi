@@ -437,7 +437,7 @@ function App() {
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-400"></div>
           <span className="text-slate-950 font-bold uppercase text-xs tracking-widest text-center px-6">
-            Sincronizando FARMASI...
+            Sincronizando FLUXO BEAUTY...
           </span>
         </div>
       );

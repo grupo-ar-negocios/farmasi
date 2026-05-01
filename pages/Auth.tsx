@@ -45,7 +45,7 @@ export function Auth() {
                         <div className="flex justify-center mb-6">
                             <img
                                 src="/logo.png"
-                                alt="FARMASI Logo"
+                                alt="FLUXO BEAUTY Logo"
                                 className="w-48 h-48 object-contain drop-shadow-xl"
                             />
                         </div>
@@ -128,7 +128,7 @@ export function Auth() {
 
                 {/* Support lines */}
                 <p className="text-center mt-8 text-[10px] text-slate-400 font-medium tracking-widest uppercase">
-                    FARMASI &copy; 2025 • Gestão de Alta Performance
+                    FLUXO BEAUTY &copy; 2025 • Gestão de Alta Performance
                 </p>
             </div>
         </div>

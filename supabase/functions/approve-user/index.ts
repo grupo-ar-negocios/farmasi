@@ -47,10 +47,10 @@ Deno.serve(async (req) => {
             </div>
             <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4">Acesso Liberado!</h1>
             <p class="text-slate-500 font-bold text-sm leading-relaxed mb-8">
-              O usuário foi aprovado com sucesso e já pode acessar o sistema FARMASI.
+              O usuário foi aprovado com sucesso e já pode acessar o sistema FLUXO BEAUTY.
             </p>
             <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-              SISTEMA DE GESTÃO FARMASI
+              SISTEMA DE GESTÃO FLUXO BEAUTY
             </div>
           </div>
         </body>
