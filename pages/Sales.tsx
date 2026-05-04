@@ -174,11 +174,21 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                 <th className="px-5 sm:px-8 py-4 sm:py-6">Produtos</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6">Canal</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6 text-right">Total</th>
+                <th className="px-5 sm:px-8 py-4 sm:py-6 text-right">Lucro</th>
                 <th className="px-5 sm:px-8 py-4 sm:py-6 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {sales.map(sale => (
+              {sales.map(sale => {
+                const saleCost = sale.totalCost;
+                let commission = 0;
+                if (sale.type === 'consignment' && sale.originSalonId) {
+                  const salon = salons.find(s => String(s.id) === String(sale.originSalonId));
+                  if (salon) commission = (sale.totalValue * salon.commissionRate) / 100;
+                }
+                const profit = sale.totalValue - saleCost - commission;
+                
+                return (
                 <tr key={sale.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-[11px] sm:text-xs font-bold text-slate-900 whitespace-nowrap">{new Date(sale.date).toLocaleDateString()}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-tight whitespace-nowrap">{clients.find(c => String(c.id) === String(sale.clientId))?.name || 'Balcão'}</td>
@@ -198,13 +208,14 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                     </span>
                   </td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-[13px] sm:text-sm text-slate-950 whitespace-nowrap">R$ {sale.totalValue.toFixed(2)}</td>
+                  <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-[13px] sm:text-sm text-emerald-600 whitespace-nowrap">R$ {profit.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
                     <div className="flex justify-center gap-1 sm:gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => { if (confirm("Confirmar exclusão desta venda?")) onDelete(sale.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

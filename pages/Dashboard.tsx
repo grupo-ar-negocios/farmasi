@@ -66,17 +66,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
   const potentialStockValue = products.reduce((acc, p) => acc + (p.stockQuantity * p.sellPrice), 0);
   const potentialTotalValue = products.reduce((acc, p) => acc + ((p.stockQuantity + p.consignedQuantity) * p.sellPrice), 0);
 
-  const chartDataMap = new Map<string, number>();
+  const chartDataMap = new Map<string, { value: number, profit: number }>();
   sales.forEach(sale => {
     const dateKey = new Date(sale.date).toISOString().split('T')[0];
-    chartDataMap.set(dateKey, (chartDataMap.get(dateKey) || 0) + sale.totalValue);
+    const saleCost = sale.totalCost;
+    let commission = 0;
+    if (sale.type === 'consignment' && sale.originSalonId) {
+      const salon = salons.find(s => String(s.id) === String(sale.originSalonId));
+      if (salon) commission = (sale.totalValue * salon.commissionRate) / 100;
+    }
+    const profit = sale.totalValue - saleCost - commission;
+
+    const existing = chartDataMap.get(dateKey) || { value: 0, profit: 0 };
+    chartDataMap.set(dateKey, {
+      value: existing.value + sale.totalValue,
+      profit: existing.profit + profit
+    });
   });
   const chartData = Array.from(chartDataMap.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
     .slice(-10)
-    .map(([date, value]) => ({
+    .map(([date, data]) => ({
       name: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-      value
+      value: data.value,
+      profit: data.profit
     }));
 
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,11 +236,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
                     <stop offset="5%" stopColor="#800020" stopOpacity={0.1} />
                     <stop offset="95%" stopColor="#800020" stopOpacity={0} />
                   </linearGradient>
+                  <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#cbd5e1', fontSize: 8, fontWeight: 700 }} dy={10} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', fontWeight: 700, fontSize: '9px', textTransform: 'uppercase' }} />
-                <Area type="monotone" dataKey="value" stroke="#800020" strokeWidth={3} fillOpacity={1} fill="url(#colorVal)" dot={{ r: 3, fill: '#fff', strokeWidth: 1.5, stroke: '#800020' }} activeDot={{ r: 5, fill: '#800020', strokeWidth: 0 }} />
+                <Tooltip formatter={(value: number) => `R$ ${value.toFixed(2)}`} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', fontWeight: 700, fontSize: '9px', textTransform: 'uppercase' }} />
+                <Area type="monotone" name="Venda" dataKey="value" stroke="#800020" strokeWidth={3} fillOpacity={1} fill="url(#colorVal)" dot={{ r: 3, fill: '#fff', strokeWidth: 1.5, stroke: '#800020' }} activeDot={{ r: 5, fill: '#800020', strokeWidth: 0 }} />
+                <Area type="monotone" name="Lucro" dataKey="profit" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" dot={{ r: 3, fill: '#fff', strokeWidth: 1.5, stroke: '#10b981' }} activeDot={{ r: 5, fill: '#10b981', strokeWidth: 0 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
