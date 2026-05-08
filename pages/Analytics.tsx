@@ -151,23 +151,29 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
 
   // Chart data (grouped by date)
   const chartData = useMemo(() => {
-    const groupedByDate: Record<string, { date: string, revenue: number, profit: number }> = {};
+    const groupedByDate: Record<string, { date: string, revenue: number, profit: number, timestamp: number }> = {};
     
     filteredData.forEach(item => {
-      const dateStr = new Date(item.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      // Use YYYY-MM-DD to avoid merging different years
+      const dateStr = item.date.split('T')[0] || item.date;
       if (!groupedByDate[dateStr]) {
-        groupedByDate[dateStr] = { date: dateStr, revenue: 0, profit: 0 };
+        // Create an explicit date object at noon to avoid timezone shift issues
+        const [year, month, day] = dateStr.split('-');
+        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0);
+        
+        groupedByDate[dateStr] = { 
+          date: dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }), 
+          revenue: 0, 
+          profit: 0,
+          timestamp: dateObj.getTime()
+        };
       }
       groupedByDate[dateStr].revenue += item.revenue;
       groupedByDate[dateStr].profit += item.profit;
     });
 
-    // Convert to array and sort chronologically
-    return Object.values(groupedByDate).sort((a, b) => {
-      const [dayA, monthA] = a.date.split('/');
-      const [dayB, monthB] = b.date.split('/');
-      return new Date(2026, parseInt(monthA)-1, parseInt(dayA)).getTime() - new Date(2026, parseInt(monthB)-1, parseInt(dayB)).getTime();
-    });
+    // Convert to array and sort chronologically (oldest to newest)
+    return Object.values(groupedByDate).sort((a, b) => a.timestamp - b.timestamp);
   }, [filteredData]);
 
   return (
