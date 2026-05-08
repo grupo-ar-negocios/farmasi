@@ -21,6 +21,7 @@ import { Consignments } from './pages/Consignments';
 import { Salons } from './pages/Salons';
 import { Clients } from './pages/Clients';
 import { Reports } from './pages/Reports';
+import { Analytics } from './pages/Analytics';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -465,6 +466,8 @@ function App() {
         return <Clients clients={clients} sales={sales} onAdd={handleAddClient} onEdit={handleEditClient} onDelete={handleDeleteClient} startOpen={autoOpenModal} />;
       case 'reports':
         return <Reports sales={sales} products={products} salons={salons} />;
+      case 'analytics':
+        return <Analytics sales={sales} products={products} clients={clients} salons={salons} />;
       default: return null;
     }
   };
