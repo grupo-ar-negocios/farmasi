@@ -47,6 +47,16 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
+  const formatProfitCurrency = (value: number) => {
+    const isNegative = value < 0;
+    const isPositive = value > 0;
+    const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.abs(value));
+    
+    if (isPositive) return `+ ${formatted}`;
+    if (isNegative) return `- ${formatted}`;
+    return formatted;
+  };
+
   // Helper to format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR');
@@ -60,17 +70,37 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
       setDateEnd('');
     } else if (filter === 'today') {
       const today = new Date();
-      const dateString = today.toISOString().split('T')[0];
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
       setDateStart(dateString);
       setDateEnd(dateString);
     } else if (filter === 'month') {
       const today = new Date();
       const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
       const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      setDateStart(startOfMonth.toISOString().split('T')[0]);
-      setDateEnd(endOfMonth.toISOString().split('T')[0]);
+      const startString = `${startOfMonth.getFullYear()}-${String(startOfMonth.getMonth() + 1).padStart(2, '0')}-01`;
+      const endString = `${endOfMonth.getFullYear()}-${String(endOfMonth.getMonth() + 1).padStart(2, '0')}-${String(endOfMonth.getDate()).padStart(2, '0')}`;
+      setDateStart(startString);
+      setDateEnd(endString);
     }
   };
+
+  // Get unique products that have been sold
+  const soldProducts = useMemo(() => {
+    const soldMap = new Map<string, string>();
+    sales.forEach(sale => {
+      sale.items.forEach(item => {
+        if (!soldMap.has(item.productId)) {
+          soldMap.set(item.productId, item.productName);
+        }
+      });
+    });
+    return Array.from(soldMap.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [sales]);
 
   // Data processing
   const filteredData = useMemo(() => {
@@ -86,9 +116,12 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
         }
       }
 
-      // Check dates
-      if (dateStart && new Date(sale.date) < new Date(dateStart + 'T00:00:00')) return;
-      if (dateEnd && new Date(sale.date) > new Date(dateEnd + 'T23:59:59')) return;
+      // Check dates safely
+      const saleDateObj = new Date(sale.date);
+      const saleDateString = `${saleDateObj.getFullYear()}-${String(saleDateObj.getMonth() + 1).padStart(2, '0')}-${String(saleDateObj.getDate()).padStart(2, '0')}`;
+      
+      if (dateStart && saleDateString < dateStart) return;
+      if (dateEnd && saleDateString > dateEnd) return;
       
       // Check type
       if (selectedType && sale.type !== selectedType) return;
@@ -154,18 +187,18 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
     const groupedByDate: Record<string, { date: string, revenue: number, profit: number, timestamp: number }> = {};
     
     filteredData.forEach(item => {
-      // Use YYYY-MM-DD to avoid merging different years
-      const dateStr = item.date.split('T')[0] || item.date;
+      const dateObj = new Date(item.date);
+      const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+      
       if (!groupedByDate[dateStr]) {
         // Create an explicit date object at noon to avoid timezone shift issues
-        const [year, month, day] = dateStr.split('-');
-        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0);
+        const noonDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 12, 0, 0);
         
         groupedByDate[dateStr] = { 
-          date: dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }), 
+          date: noonDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }), 
           revenue: 0, 
           profit: 0,
-          timestamp: dateObj.getTime()
+          timestamp: noonDate.getTime()
         };
       }
       groupedByDate[dateStr].revenue += item.revenue;
@@ -241,7 +274,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
             onChange={(e) => setSelectedProductId(e.target.value)}
           >
             <option value="">Todos os Produtos</option>
-            {products.map(p => (
+            {soldProducts.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
           </select>
@@ -283,12 +316,16 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
           <p className="text-2xl font-black text-slate-800 relative z-10">{formatCurrency(summary.revenue)}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-5 rounded-2xl shadow-md text-white relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-30 transition-opacity">
-            <TrendingUp size={64} />
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
+          <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity ${
+             summary.profit > 0 ? 'text-emerald-500' : summary.profit < 0 ? 'text-rose-500' : 'text-slate-500'
+          }`}>
+            {summary.profit >= 0 ? <TrendingUp size={64} /> : <TrendingDown size={64} />}
           </div>
-          <p className="text-xs font-bold text-emerald-100 uppercase tracking-widest mb-1 relative z-10">Lucro Líquido</p>
-          <p className="text-2xl font-black relative z-10">{formatCurrency(summary.profit)}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Lucro Líquido</p>
+          <p className={`text-2xl font-black relative z-10 ${
+            summary.profit > 0 ? 'text-emerald-500' : summary.profit < 0 ? 'text-rose-500' : 'text-slate-800'
+          }`}>{formatProfitCurrency(summary.profit)}</p>
         </div>
         
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
@@ -312,7 +349,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
       {chartData.length > 0 && (
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
           <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
-            <BarChart2 className="text-[#800020]" size={20} />
+            <BarChart2 className="text-[#3b82f6]" size={20} />
             Evolução de Vendas e Lucro
           </h3>
           <div className="h-[300px] w-full">
@@ -320,8 +357,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#800020" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#800020" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -334,10 +371,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
                 <RechartsTooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', padding: '12px 16px' }}
                   itemStyle={{ fontWeight: 'bold' }}
-                  formatter={(value: number) => [formatCurrency(value), '']}
+                  formatter={(value: number, name: string) => [name === 'Lucro' ? formatProfitCurrency(value) : formatCurrency(value), '']}
                 />
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                <Area type="monotone" dataKey="revenue" name="Faturamento" stroke="#800020" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                <Area type="monotone" dataKey="revenue" name="Faturamento" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
                 <Area type="monotone" dataKey="profit" name="Lucro" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -393,7 +430,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
                         item.profit < 0 ? 'bg-rose-50 text-rose-600' : 
                         'bg-slate-100 text-slate-600'
                       }`}>
-                        {formatCurrency(item.profit)}
+                        {formatProfitCurrency(item.profit)}
                       </span>
                     </td>
                   </tr>
