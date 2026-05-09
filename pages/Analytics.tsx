@@ -458,7 +458,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
             </div>
           </div>
 
-          <div className="flex flex-col xl:flex-row gap-6">
+          <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1 space-y-3">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top 5 Prejuízos</p>
               {insights.lossProducts.length > 0 ? (
@@ -475,27 +475,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
               )}
             </div>
 
-            <div className="flex-1 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Últimos Brindes</p>
-                <p className="text-[10px] font-bold text-rose-500 uppercase">Total: {formatProfitCurrency(insights.brindesLoss)}</p>
+            <div className="w-full sm:w-48 space-y-3">
+              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Brindes ({insights.brindesQty} un)</p>
+                <p className="text-sm font-black text-rose-600">{formatProfitCurrency(insights.brindesLoss)}</p>
               </div>
-              {insights.last5Brindes.length > 0 ? (
-                <div className="space-y-2">
-                  {insights.last5Brindes.map((b, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-rose-50 px-3 py-2 rounded-xl border border-rose-100">
-                      <span className="text-xs font-bold text-rose-700 truncate mr-2" title={b.name}>{b.name}</span>
-                      <span className="text-[10px] font-black text-rose-500 whitespace-nowrap">{formatDate(b.date)}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs font-medium text-slate-500 italic">Nenhum brinde no período.</p>
-              )}
-              
-              {/* Eventos Total */}
-              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl mt-4">
-                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Total em Eventos</p>
+              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Eventos</p>
                 <p className="text-sm font-black text-rose-600">{formatProfitCurrency(insights.eventosLoss)}</p>
               </div>
             </div>
