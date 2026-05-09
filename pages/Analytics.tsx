@@ -37,7 +37,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
   // Filters state
   const [dateStart, setDateStart] = useState('');
   const [dateEnd, setDateEnd] = useState('');
-  const [selectedProductId, setSelectedProductId] = useState('');
+  const [selectedProductName, setSelectedProductName] = useState('');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedType, setSelectedType] = useState<'' | 'direct' | 'consignment'>('');
   const [quickFilter, setQuickFilter] = useState<'all' | 'today' | 'month' | 'negative_profit'>('all');
@@ -87,20 +87,17 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
     }
   };
 
-  // Get unique products that have been sold
-  const soldProducts = useMemo(() => {
-    const soldMap = new Map<string, string>();
+  // Get unique products (from inventory and past sales)
+  const allProductNames = useMemo(() => {
+    const names = new Set<string>();
+    products.forEach(p => names.add(p.name));
     sales.forEach(sale => {
       sale.items.forEach(item => {
-        if (!soldMap.has(item.productId)) {
-          soldMap.set(item.productId, item.productName);
-        }
+        if (item.productName) names.add(item.productName);
       });
     });
-    return Array.from(soldMap.entries())
-      .map(([id, name]) => ({ id, name }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [sales]);
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }, [products, sales]);
 
   // Data processing
   const filteredData = useMemo(() => {
@@ -134,7 +131,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
 
       sale.items.forEach(item => {
         // Check product filter
-        if (selectedProductId && item.productId !== selectedProductId) return;
+        if (selectedProductName && item.productName !== selectedProductName) return;
 
         const itemRevenue = item.unitPrice * item.quantity;
         const itemCost = item.unitCost * item.quantity;
@@ -168,7 +165,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
     explodedItems.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return explodedItems;
-  }, [sales, clients, salons, dateStart, dateEnd, selectedType, selectedClientId, selectedProductId, quickFilter]);
+  }, [sales, clients, salons, dateStart, dateEnd, selectedType, selectedClientId, selectedProductName, quickFilter]);
 
   // Aggregations
   const summary = useMemo(() => {
@@ -188,16 +185,17 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
     let brindesQty = 0;
     let brindesLoss = 0;
     let eventosLoss = 0;
+    const brindesList: { name: string, date: string, profit: number }[] = [];
 
     filteredData.forEach(item => {
       // Group by product
-      if (!productStats[item.productId]) {
-        productStats[item.productId] = { name: item.productName, profit: 0, revenue: 0, quantity: 0, cost: 0 };
+      if (!productStats[item.productName]) {
+        productStats[item.productName] = { name: item.productName, profit: 0, revenue: 0, quantity: 0, cost: 0 };
       }
-      productStats[item.productId].profit += item.profit;
-      productStats[item.productId].revenue += item.revenue;
-      productStats[item.productId].quantity += item.quantity;
-      productStats[item.productId].cost += item.cost;
+      productStats[item.productName].profit += item.profit;
+      productStats[item.productName].revenue += item.revenue;
+      productStats[item.productName].quantity += item.quantity;
+      productStats[item.productName].cost += item.cost;
 
       // Check brindes and eventos
       const isBrinde = item.unitPrice === 0 || item.clientName.toLowerCase().includes('brinde') || item.productName.toLowerCase().includes('brinde');
@@ -206,6 +204,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
       if (isBrinde) {
         brindesQty += item.quantity;
         if (item.profit < 0) brindesLoss += item.profit;
+        brindesList.push({ name: item.productName, date: item.date, profit: item.profit });
       } else if (isEvento) {
         if (item.profit < 0) eventosLoss += item.profit;
       }
@@ -213,21 +212,20 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
 
     const productsArr = Object.values(productStats);
 
-    let champion = null;
-    if (productsArr.length > 0) {
-      const best = productsArr.reduce((prev, current) => (prev.profit > current.profit) ? prev : current);
-      if (best.profit > 0) champion = best;
-    }
+    const top3Champions = productsArr.filter(p => p.profit > 0).sort((a, b) => b.profit - a.profit).slice(0, 3);
     
     // Top 5 losses
     const lossProducts = productsArr.filter(p => p.profit < 0).sort((a, b) => a.profit - b.profit).slice(0, 5);
 
+    const last5Brindes = brindesList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+
     return {
-      champion,
+      top3Champions,
       lossProducts,
       brindesQty,
       brindesLoss,
-      eventosLoss
+      eventosLoss,
+      last5Brindes
     };
   }, [filteredData]);
 
@@ -319,12 +317,12 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
           <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Produto</label>
           <select 
             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
-            value={selectedProductId}
-            onChange={(e) => setSelectedProductId(e.target.value)}
+            value={selectedProductName}
+            onChange={(e) => setSelectedProductName(e.target.value)}
           >
             <option value="">Todos os Produtos</option>
-            {soldProducts.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+            {allProductNames.map(name => (
+              <option key={name} value={name}>{name}</option>
             ))}
           </select>
         </div>
@@ -413,30 +411,35 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
               <TrendingUp size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-800">Produto Campeão</h3>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Mais lucrativo do período</p>
+              <h3 className="text-lg font-black text-slate-800">Produtos Campeões</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Top 3 do período</p>
             </div>
           </div>
           
-          {insights.champion ? (
-            <div className="space-y-4">
-              <div className="bg-amber-50/50 border border-amber-100 p-4 rounded-2xl">
-                <p className="text-lg font-black text-amber-900 line-clamp-1">{insights.champion.name}</p>
-                <div className="grid grid-cols-3 gap-4 mt-4">
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lucro gerado</p>
-                    <p className="text-sm font-black text-emerald-600">{formatProfitCurrency(insights.champion.profit)}</p>
+          {insights.top3Champions.length > 0 ? (
+            <div className="space-y-3">
+              {insights.top3Champions.map((champion, index) => (
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between bg-amber-50/50 border border-amber-100 p-3 rounded-2xl">
+                  <div className="flex items-center gap-3 mb-2 sm:mb-0">
+                    <span className="bg-amber-200 text-amber-800 text-xs font-black px-2 py-1 rounded-lg">#{index + 1}</span>
+                    <p className="text-sm font-black text-amber-900 line-clamp-1" title={champion.name}>{champion.name}</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Margem %</p>
-                    <p className="text-sm font-black text-slate-800">{insights.champion.revenue > 0 ? ((insights.champion.profit / insights.champion.revenue) * 100).toFixed(1) : 0}%</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Qtd Vendida</p>
-                    <p className="text-sm font-black text-slate-800">{insights.champion.quantity} un</p>
+                  <div className="flex items-center gap-4 text-right">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vendidos</p>
+                      <p className="text-sm font-bold text-slate-700">{champion.quantity} un</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Margem</p>
+                      <p className="text-sm font-bold text-slate-700">{champion.revenue > 0 ? ((champion.profit / champion.revenue) * 100).toFixed(1) : 0}%</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lucro</p>
+                      <p className="text-sm font-black text-emerald-600">{formatProfitCurrency(champion.profit)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           ) : (
             <p className="text-sm font-medium text-slate-500 italic">Nenhum produto com lucro no período.</p>
@@ -455,7 +458,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex flex-col xl:flex-row gap-6">
             <div className="flex-1 space-y-3">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top 5 Prejuízos</p>
               {insights.lossProducts.length > 0 ? (
@@ -472,13 +475,27 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
               )}
             </div>
 
-            <div className="w-full sm:w-48 space-y-3">
-              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl">
-                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Brindes ({insights.brindesQty} un)</p>
-                <p className="text-sm font-black text-rose-600">{formatProfitCurrency(insights.brindesLoss)}</p>
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Últimos Brindes</p>
+                <p className="text-[10px] font-bold text-rose-500 uppercase">Total: {formatProfitCurrency(insights.brindesLoss)}</p>
               </div>
-              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl">
-                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Eventos</p>
+              {insights.last5Brindes.length > 0 ? (
+                <div className="space-y-2">
+                  {insights.last5Brindes.map((b, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-rose-50 px-3 py-2 rounded-xl border border-rose-100">
+                      <span className="text-xs font-bold text-rose-700 truncate mr-2" title={b.name}>{b.name}</span>
+                      <span className="text-[10px] font-black text-rose-500 whitespace-nowrap">{formatDate(b.date)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs font-medium text-slate-500 italic">Nenhum brinde no período.</p>
+              )}
+              
+              {/* Eventos Total */}
+              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl mt-4">
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Total em Eventos</p>
                 <p className="text-sm font-black text-rose-600">{formatProfitCurrency(insights.eventosLoss)}</p>
               </div>
             </div>
