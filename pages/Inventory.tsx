@@ -107,12 +107,12 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
                 <tr key={product.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-5 sm:px-8 py-4 sm:py-6 font-bold text-slate-900 text-[11px] sm:text-xs tracking-tight whitespace-nowrap">{product.code}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 font-bold text-slate-900 text-[11px] sm:text-xs uppercase tracking-tight">{product.name}</td>
-                  <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
+                  <td className="px-5 sm:px-8 py-4 sm:py-6 text-center whitespace-nowrap">
                     <span className={`font-bold text-[9px] sm:text-[10px] px-3 sm:px-4 py-1.5 rounded-full uppercase ${product.stockQuantity <= 3 ? 'bg-red-50 text-[#800020]' : 'bg-slate-50 text-slate-600'}`}>
                       {product.stockQuantity} un
                     </span>
                   </td>
-                  <td className="px-5 sm:px-8 py-4 sm:py-6 text-center font-bold text-slate-900 text-xs">
+                  <td className="px-5 sm:px-8 py-4 sm:py-6 text-center font-bold text-slate-900 text-xs whitespace-nowrap">
                     <span className="bg-blue-50/50 text-blue-600 px-3 sm:px-4 py-1.5 rounded-full uppercase text-[9px] sm:text-[10px]">{product.consignedQuantity} un</span>
                   </td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-slate-500 text-xs sm:text-sm whitespace-nowrap">R$ {product.costPrice.toFixed(2)}</td>
