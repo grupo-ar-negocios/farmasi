@@ -182,6 +182,55 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
     }, { revenue: 0, cost: 0, commission: 0, profit: 0, quantity: 0 });
   }, [filteredData]);
 
+  // Insights
+  const insights = useMemo(() => {
+    const productStats: Record<string, { name: string, profit: number, revenue: number, quantity: number, cost: number }> = {};
+    let brindesQty = 0;
+    let brindesLoss = 0;
+    let eventosLoss = 0;
+
+    filteredData.forEach(item => {
+      // Group by product
+      if (!productStats[item.productId]) {
+        productStats[item.productId] = { name: item.productName, profit: 0, revenue: 0, quantity: 0, cost: 0 };
+      }
+      productStats[item.productId].profit += item.profit;
+      productStats[item.productId].revenue += item.revenue;
+      productStats[item.productId].quantity += item.quantity;
+      productStats[item.productId].cost += item.cost;
+
+      // Check brindes and eventos
+      const isBrinde = item.unitPrice === 0 || item.clientName.toLowerCase().includes('brinde') || item.productName.toLowerCase().includes('brinde');
+      const isEvento = item.clientName.toLowerCase().includes('evento') || item.productName.toLowerCase().includes('evento');
+
+      if (isBrinde) {
+        brindesQty += item.quantity;
+        if (item.profit < 0) brindesLoss += item.profit;
+      } else if (isEvento) {
+        if (item.profit < 0) eventosLoss += item.profit;
+      }
+    });
+
+    const productsArr = Object.values(productStats);
+
+    let champion = null;
+    if (productsArr.length > 0) {
+      const best = productsArr.reduce((prev, current) => (prev.profit > current.profit) ? prev : current);
+      if (best.profit > 0) champion = best;
+    }
+    
+    // Top 5 losses
+    const lossProducts = productsArr.filter(p => p.profit < 0).sort((a, b) => a.profit - b.profit).slice(0, 5);
+
+    return {
+      champion,
+      lossProducts,
+      brindesQty,
+      brindesLoss,
+      eventosLoss
+    };
+  }, [filteredData]);
+
   // Chart data (grouped by date)
   const chartData = useMemo(() => {
     const groupedByDate: Record<string, { date: string, revenue: number, profit: number, timestamp: number }> = {};
@@ -307,7 +356,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <DollarSign size={64} />
@@ -327,6 +376,16 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
             summary.profit > 0 ? 'text-emerald-500' : summary.profit < 0 ? 'text-rose-500' : 'text-slate-800'
           }`}>{formatProfitCurrency(summary.profit)}</p>
         </div>
+
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <PieChart size={64} />
+          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Margem %</p>
+          <p className="text-2xl font-black text-slate-800 relative z-10">
+            {summary.revenue > 0 ? ((summary.profit / summary.revenue) * 100).toFixed(1) : 0}%
+          </p>
+        </div>
         
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -342,6 +401,88 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Produtos Vendidos</p>
           <p className="text-2xl font-black text-slate-800 relative z-10">{summary.quantity} unid.</p>
+        </div>
+      </div>
+
+      {/* Insights Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Champion Product */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-amber-100 text-amber-600 p-3 rounded-2xl">
+              <TrendingUp size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-800">Produto Campeão</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Mais lucrativo do período</p>
+            </div>
+          </div>
+          
+          {insights.champion ? (
+            <div className="space-y-4">
+              <div className="bg-amber-50/50 border border-amber-100 p-4 rounded-2xl">
+                <p className="text-lg font-black text-amber-900 line-clamp-1">{insights.champion.name}</p>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lucro gerado</p>
+                    <p className="text-sm font-black text-emerald-600">{formatProfitCurrency(insights.champion.profit)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Margem %</p>
+                    <p className="text-sm font-black text-slate-800">{insights.champion.revenue > 0 ? ((insights.champion.profit / insights.champion.revenue) * 100).toFixed(1) : 0}%</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Qtd Vendida</p>
+                    <p className="text-sm font-black text-slate-800">{insights.champion.quantity} un</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm font-medium text-slate-500 italic">Nenhum produto com lucro no período.</p>
+          )}
+        </div>
+
+        {/* Losses and Gifts */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-rose-100 text-rose-600 p-3 rounded-2xl">
+              <TrendingDown size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-800">Prejuízos & Brindes</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Atenção aos números</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex-1 space-y-3">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top 5 Prejuízos</p>
+              {insights.lossProducts.length > 0 ? (
+                <div className="space-y-2">
+                  {insights.lossProducts.map((p, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-xl">
+                      <span className="text-xs font-bold text-slate-700 truncate mr-2" title={p.name}>{p.name}</span>
+                      <span className="text-xs font-black text-rose-600 whitespace-nowrap">{formatProfitCurrency(p.profit)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs font-medium text-slate-500 italic">Nenhum produto deu prejuízo!</p>
+              )}
+            </div>
+
+            <div className="w-full sm:w-48 space-y-3">
+              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Brindes ({insights.brindesQty} un)</p>
+                <p className="text-sm font-black text-rose-600">{formatProfitCurrency(insights.brindesLoss)}</p>
+              </div>
+              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">Eventos</p>
+                <p className="text-sm font-black text-rose-600">{formatProfitCurrency(insights.eventosLoss)}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
