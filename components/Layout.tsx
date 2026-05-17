@@ -12,7 +12,8 @@ import {
   X,
   BarChart3,
   LineChart,
-  LogOut
+  LogOut,
+  Calculator
 } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
@@ -64,6 +65,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
     { view: 'clients' as ViewState, label: 'Clientes', icon: Users },
     { view: 'reports' as ViewState, label: 'Relatórios', icon: BarChart3 },
     { view: 'analytics' as ViewState, label: 'Análises', icon: LineChart },
+    { view: 'simulator' as ViewState, label: 'Simulador', icon: Calculator },
   ];
 
   return (

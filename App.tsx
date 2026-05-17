@@ -22,6 +22,7 @@ import { Salons } from './pages/Salons';
 import { Clients } from './pages/Clients';
 import { Reports } from './pages/Reports';
 import { Analytics } from './pages/Analytics';
+import { Simulator } from './pages/Simulator';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -468,6 +469,8 @@ function App() {
         return <Reports sales={sales} products={products} salons={salons} />;
       case 'analytics':
         return <Analytics sales={sales} products={products} clients={clients} salons={salons} />;
+      case 'simulator':
+        return <Simulator products={products} />;
       default: return null;
     }
   };

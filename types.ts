@@ -57,4 +57,4 @@ export interface SaleItem {
   unitCost: number;
 }
 
-export type ViewState = 'dashboard' | 'sales' | 'inventory' | 'consignments' | 'salons' | 'clients' | 'reports' | 'analytics';
+export type ViewState = 'dashboard' | 'sales' | 'inventory' | 'consignments' | 'salons' | 'clients' | 'reports' | 'analytics' | 'simulator';
