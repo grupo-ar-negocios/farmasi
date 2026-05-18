@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Product } from '../types';
-import { Calculator, Plus, Trash2, Tag, TrendingUp, HelpCircle, Package } from 'lucide-react';
-import { formatCurrency } from '../services/utils';
+import { Calculator, Plus, Trash2, Tag, TrendingUp, HelpCircle, Package, Search } from 'lucide-react';
+import { formatCurrency, normalizeString } from '../services/utils';
 
 interface SimulatorProps {
   products: Product[];
@@ -19,12 +19,45 @@ interface SimulatedItem {
 export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
   const [cart, setCart] = useState<SimulatedItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
   const [customPrice, setCustomPrice] = useState<number | ''>('');
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const activeProducts = useMemo(() => {
     return products.slice().sort((a, b) => a.name.localeCompare(b.name));
   }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm) return activeProducts;
+    return activeProducts.filter(p => 
+      normalizeString(p.name).includes(normalizeString(searchTerm)) ||
+      (p.code && normalizeString(p.code).includes(normalizeString(searchTerm)))
+    );
+  }, [activeProducts, searchTerm]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setSelectedProductId('');
+    setIsDropdownOpen(true);
+  };
+
+  const handleSelectProduct = (product: Product) => {
+    setSelectedProductId(product.id);
+    setSearchTerm(product.name);
+    setIsDropdownOpen(false);
+  };
 
   const selectedProduct = useMemo(() => {
     return activeProducts.find(p => p.id === selectedProductId);
@@ -58,6 +91,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
     
     // Reset inputs
     setSelectedProductId('');
+    setSearchTerm('');
     setCustomPrice('');
     setQuantity(1);
   };
@@ -116,19 +150,38 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
             </h3>
 
             <form onSubmit={handleAddItem} className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Selecione o Produto</label>
-                <select 
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all text-slate-700"
-                  value={selectedProductId}
-                  onChange={(e) => setSelectedProductId(e.target.value)}
-                  required
-                >
-                  <option value="">Selecione um produto...</option>
-                  {activeProducts.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
+              <div ref={dropdownRef} className="relative">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Buscar Produto</label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="DIGITE O NOME OU CÓDIGO..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all text-slate-900 uppercase"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    onFocus={() => setIsDropdownOpen(true)}
+                  />
+                </div>
+
+                {isDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar">
+                    {filteredProducts.length > 0 ? (
+                      filteredProducts.map(p => (
+                        <div
+                          key={p.id}
+                          className="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors"
+                          onClick={() => handleSelectProduct(p)}
+                        >
+                          <div className="text-xs font-bold text-slate-900 uppercase">{p.name}</div>
+                          {p.code && <div className="text-[10px] text-slate-400 mt-0.5 uppercase">Cód: {p.code}</div>}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-xs text-slate-500 text-center font-medium uppercase">Nenhum produto encontrado</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {selectedProduct && (
