@@ -127,7 +127,7 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
                 </p>
                 <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase">
                   <span>Valor Consignado:</span>
-                  <span className="text-slate-950 font-black">R$ {totalConsignedValue.toFixed(2)}</span>
+                  <span className="text-slate-950 font-black">R$ {totalCostOfConsigned.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase">
                   <span>Se vender tudo (s/ desc):</span>
