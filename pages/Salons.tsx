@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Salon, Sale } from '../types';
+import { Salon, Sale, Consignment, Product } from '../types';
 import { Store, Phone, MapPin, Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import { Modal } from '../components/Modal';
 
 interface SalonsProps {
   salons: Salon[];
   sales: Sale[];
+  consignments: Consignment[];
+  products: Product[];
   onAdd: (s: Omit<Salon, 'id'>) => void;
   onEdit: (s: Salon) => void;
   onDelete: (id: string) => void;
@@ -14,7 +16,7 @@ interface SalonsProps {
   startOpen?: boolean;
 }
 
-export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, onDelete, onPayCommission, startOpen }) => {
+export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, products, onAdd, onEdit, onDelete, onPayCommission, startOpen }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingSalon, setEditingSalon] = useState<Salon | null>(null);
   const [formData, setFormData] = useState<Partial<Salon>>({});
@@ -82,6 +84,25 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, on
           const pendingSales = getPendingSales(salon.id);
           const commissionValue = (pendingSales.reduce((acc, s) => acc + s.totalValue, 0) * salon.commissionRate) / 100;
 
+          // Consignment Calculations
+          const salonConsignments = consignments.filter(c => String(c.salonId) === String(salon.id));
+          let totalConsignedValue = 0;
+          let totalCostOfConsigned = 0;
+
+          salonConsignments.forEach(c => {
+            const remainingQty = c.quantity - c.soldQuantity - c.returnedQuantity;
+            if (remainingQty > 0) {
+              const product = products.find(p => String(p.id) === String(c.productId));
+              if (product) {
+                totalConsignedValue += remainingQty * product.sellPrice;
+                totalCostOfConsigned += remainingQty * product.costPrice;
+              }
+            }
+          });
+
+          const totalValueComDesconto = totalConsignedValue * (1 - salon.commissionRate / 100);
+          const estimatedProfit = totalValueComDesconto - totalCostOfConsigned;
+
           return (
             <div key={salon.id} className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all flex flex-col group relative overflow-hidden">
               <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-2 sm:gap-3 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all">
@@ -89,12 +110,36 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, onAdd, onEdit, on
                 <button onClick={() => { if (confirm(`Excluir permanentemente o salão "${salon.name}"?`)) onDelete(salon.id); }} className="p-2 sm:p-3 text-[#800020] bg-red-50/50 rounded-xl sm:rounded-2xl hover:bg-red-50 transition-colors"><Trash2 size={18} /></button>
               </div>
 
-              <div className="mb-6 sm:mb-8">
+              <div className="mb-5">
                 <h3 className="font-bold text-slate-900 uppercase text-base sm:text-lg mb-3 sm:mb-4 leading-tight tracking-tight line-clamp-1 pr-16 sm:pr-24">{salon.name}</h3>
                 <div className="space-y-2 sm:space-y-3">
                   <p className="text-[9px] sm:text-[10px] font-bold text-[#D4AF37] uppercase tracking-[0.2em] sm:tracking-[0.3em]">{salon.contactPerson}</p>
                   <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] text-slate-600 font-bold bg-slate-50 p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-slate-100"><Phone size={14} className="text-[#800020] shrink-0" /> {salon.phone}</div>
                   <div className="flex items-start gap-2 sm:gap-3 text-[10px] sm:text-[11px] text-slate-600 font-bold bg-slate-50 p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-slate-100"><MapPin size={14} className="text-[#800020] mt-0.5 shrink-0" /> <span className="line-clamp-2">{salon.address}</span></div>
+                </div>
+              </div>
+
+              {/* Estatísticas do Consignado Atual */}
+              <div className="bg-[#fffafa] border border-red-50/60 rounded-xl sm:rounded-2xl p-4 space-y-2 mb-4 shadow-sm">
+                <p className="text-[8px] sm:text-[9px] font-black text-[#800020] uppercase tracking-widest mb-1.5 border-b border-red-100/50 pb-1 flex justify-between">
+                  <span>Estoque Consignado</span>
+                  <span>{salonConsignments.filter(c => c.quantity - c.soldQuantity - c.returnedQuantity > 0).length} itens</span>
+                </p>
+                <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase">
+                  <span>Valor Consignado:</span>
+                  <span className="text-slate-950 font-black">R$ {totalConsignedValue.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase">
+                  <span>Se vender tudo (s/ desc):</span>
+                  <span className="text-slate-950 font-black">R$ {totalConsignedValue.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase">
+                  <span>Se vender tudo (c/ desc):</span>
+                  <span className="text-slate-950 font-black">R$ {totalValueComDesconto.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase pt-1 border-t border-red-100/50">
+                  <span>Lucro Estimado:</span>
+                  <span className="text-emerald-600 font-black">R$ {estimatedProfit.toFixed(2)}</span>
                 </div>
               </div>
 

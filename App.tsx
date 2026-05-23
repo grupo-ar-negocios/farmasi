@@ -359,23 +359,55 @@ function App() {
     refreshData();
   };
 
-  const handleAddConsignment = async (consignment: Omit<Consignment, 'id'>) => {
+  const handleAddConsignments = async (consignmentsList: Omit<Consignment, 'id'>[]) => {
     setAutoOpenModal(false);
     try {
-      await supabaseService.createConsignment(consignment);
+      await supabaseService.createConsignments(consignmentsList);
 
-      const product = products.find(p => p.id === consignment.productId);
+      const updates = consignmentsList.map(async (c) => {
+        const product = products.find(p => p.id === c.productId);
+        if (product) {
+          return supabaseService.updateProduct({
+            ...product,
+            stockQuantity: product.stockQuantity - c.quantity,
+            consignedQuantity: product.consignedQuantity + c.quantity
+          });
+        }
+      });
+      await Promise.all(updates);
+
+      refreshData();
+    } catch (e) {
+      console.error("Erro ao adicionar consignações", e);
+    }
+  };
+
+  const handleEditConsignment = async (updatedConsignment: Consignment) => {
+    try {
+      const oldConsignment = consignments.find(c => c.id === updatedConsignment.id);
+      if (!oldConsignment) return;
+
+      const qtyDiff = updatedConsignment.quantity - oldConsignment.quantity;
+      const product = products.find(p => p.id === updatedConsignment.productId);
+
+      if (product && product.stockQuantity < qtyDiff) {
+        alert("Estoque insuficiente para esta alteração!");
+        return;
+      }
+
+      await supabaseService.updateConsignment(updatedConsignment);
+
       if (product) {
         await supabaseService.updateProduct({
           ...product,
-          stockQuantity: product.stockQuantity - consignment.quantity,
-          consignedQuantity: product.consignedQuantity + consignment.quantity
+          stockQuantity: product.stockQuantity - qtyDiff,
+          consignedQuantity: product.consignedQuantity + qtyDiff
         });
       }
 
       refreshData();
     } catch (e) {
-      console.error("Erro ao adicionar consignação", e);
+      console.error("Erro ao editar consignação", e);
     }
   };
 
@@ -460,9 +492,9 @@ function App() {
       case 'sales':
         return <Sales sales={sales} products={products} clients={clients} salons={salons} consignments={consignments} onAddSale={handleAddSale} onEditSale={handleEditSale} onDelete={handleDeleteSale} startOpen={autoOpenModal} />;
       case 'consignments':
-        return <Consignments consignments={consignments} salons={salons} products={products} onAdd={handleAddConsignment} onEdit={() => { }} onDelete={handleDeleteConsignment} startOpen={autoOpenModal} />;
+        return <Consignments consignments={consignments} salons={salons} products={products} onAdd={handleAddConsignments} onEdit={handleEditConsignment} onDelete={handleDeleteConsignment} startOpen={autoOpenModal} />;
       case 'salons':
-        return <Salons salons={salons} sales={sales} onAdd={handleAddSalon} onEdit={handleEditSalon} onDelete={handleDeleteSalon} onPayCommission={handlePayCommission} startOpen={autoOpenModal} />;
+        return <Salons salons={salons} sales={sales} consignments={consignments} products={products} onAdd={handleAddSalon} onEdit={handleEditSalon} onDelete={handleDeleteSalon} onPayCommission={handlePayCommission} startOpen={autoOpenModal} />;
       case 'clients':
         return <Clients clients={clients} sales={sales} onAdd={handleAddClient} onEdit={handleEditClient} onDelete={handleDeleteClient} startOpen={autoOpenModal} />;
       case 'reports':

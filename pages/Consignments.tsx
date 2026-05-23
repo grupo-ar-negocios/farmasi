@@ -8,7 +8,7 @@ interface ConsignmentsProps {
   consignments: Consignment[];
   salons: Salon[];
   products: Product[];
-  onAdd: (c: Omit<Consignment, 'id'>) => void;
+  onAdd: (consignments: Omit<Consignment, 'id'>[]) => void;
   onEdit: (c: Consignment) => void;
   onDelete: (id: string) => void;
   startOpen?: boolean;
@@ -25,6 +25,14 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
   const [showResults, setShowResults] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  interface ConsignmentItem {
+    productId: string;
+    productName: string;
+    quantity: number;
+  }
+
+  const [items, setItems] = useState<ConsignmentItem[]>([]);
+
   useEffect(() => {
     if (startOpen) openModal();
   }, [startOpen]);
@@ -36,11 +44,13 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
       const prod = products.find(p => String(p.id) === String(consignment.productId));
       setSelectedProduct(prod || null);
       setQuantity(consignment.quantity);
+      setItems([]);
     } else {
       setEditingConsignment(null);
       setSalonId('');
       setSelectedProduct(null);
       setQuantity(1);
+      setItems([]);
     }
     setProductSearch('');
     setIsModalOpen(true);
@@ -73,30 +83,78 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
     setShowResults(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const addItem = () => {
     if (!selectedProduct) return;
 
-    const baseConsignmentData = {
-      salonId,
+    const existingQuantity = items
+      .filter(item => item.productId === selectedProduct.id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+
+    const totalRequested = existingQuantity + quantity;
+    const available = selectedProduct.stockQuantity;
+
+    if (totalRequested > available) {
+      alert(`Estoque insuficiente! Disponível: ${available}${existingQuantity > 0 ? ` (já possui ${existingQuantity} no carrinho)` : ''}`);
+      return;
+    }
+
+    setItems([...items, {
       productId: selectedProduct.id,
-      quantity,
-      soldQuantity: editingConsignment ? editingConsignment.soldQuantity : 0,
-      returnedQuantity: editingConsignment ? editingConsignment.returnedQuantity : 0,
-      status: editingConsignment ? editingConsignment.status : 'active',
-      date: editingConsignment ? editingConsignment.date : new Date().toISOString()
-    };
+      productName: selectedProduct.name,
+      quantity: quantity
+    }]);
+    setSelectedProduct(null);
+    setQuantity(1);
+    setProductSearch('');
+  };
+
+  const removeItem = (index: number) => {
+    setItems(items.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (editingConsignment) {
+      if (!selectedProduct) return;
+
+      const qtyDiff = quantity - editingConsignment.quantity;
+      if (selectedProduct.stockQuantity < qtyDiff) {
+        alert(`Estoque insuficiente! Disponível: ${selectedProduct.stockQuantity + editingConsignment.quantity} un`);
+        return;
+      }
+
       const updatedConsignment: Consignment = {
-        ...baseConsignmentData,
         id: editingConsignment.id,
+        salonId,
+        productId: selectedProduct.id,
+        quantity,
+        soldQuantity: editingConsignment.soldQuantity,
+        returnedQuantity: editingConsignment.returnedQuantity,
+        status: editingConsignment.status,
+        date: editingConsignment.date
       };
       onEdit(updatedConsignment);
+      setIsModalOpen(false);
     } else {
-      onAdd(baseConsignmentData);
+      if (items.length === 0) {
+        alert("Adicione pelo menos um produto!");
+        return;
+      }
+
+      const consignmentsList = items.map(item => ({
+        salonId,
+        productId: item.productId,
+        quantity: item.quantity,
+        soldQuantity: 0,
+        returnedQuantity: 0,
+        status: 'active' as const,
+        date: new Date().toISOString()
+      }));
+
+      onAdd(consignmentsList);
+      setIsModalOpen(false);
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -179,72 +237,121 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
         <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           <div>
             <label className="block text-[10px] sm:text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Salão Parceiro</label>
-            <select required className="w-full p-4 bg-[#fffafa] border-2 border-slate-100 rounded-xl sm:rounded-2xl text-slate-950 font-black text-[11px] sm:text-xs uppercase outline-none focus:border-[#800020] transition-all" value={salonId} onChange={e => setSalonId(e.target.value)}>
+            <select 
+              required 
+              disabled={!!editingConsignment}
+              className="w-full p-4 bg-[#fffafa] border-2 border-slate-100 rounded-xl sm:rounded-2xl text-slate-950 font-black text-[11px] sm:text-xs uppercase outline-none focus:border-[#800020] transition-all disabled:opacity-60" 
+              value={salonId} 
+              onChange={e => setSalonId(e.target.value)}
+            >
               <option value="">Selecione o Salão...</option>
               {salons.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
 
-          <div className="space-y-4">
-            <label className="block text-[10px] sm:text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Produto para Envio</label>
-
-            {selectedProduct ? (
-              <div className="flex items-center justify-between bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 border-[#800020] animate-in zoom-in duration-300 shadow-sm gap-4">
-                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
-                  <CheckCircle2 className="text-[#800020] shrink-0 w-5 h-5 sm:w-6 sm:h-6" />
-                  <div className="overflow-hidden">
-                    <p className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Selecionado</p>
-                    <p className="text-[12px] sm:text-sm font-black text-slate-950 uppercase truncate">{selectedProduct.name}</p>
-                    <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Estoque: {selectedProduct.stockQuantity} un</p>
-                  </div>
+          {editingConsignment ? (
+            /* Edição de Consignação Individual */
+            <>
+              <div>
+                <label className="block text-[10px] sm:text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Produto</label>
+                <div className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl text-slate-950 font-black text-[11px] sm:text-xs uppercase">
+                  {selectedProduct?.name}
                 </div>
-                <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-400 hover:text-[#800020] p-2 shrink-0"><X size={20} /></button>
               </div>
-            ) : (
-              <div className="relative">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#800020] w-4 h-4 sm:w-[18px] sm:h-[18px]" />
-                  <input
-                    type="text"
-                    placeholder="BUSCAR PRODUTO..."
-                    className="w-full pl-11 sm:pl-12 pr-4 py-3.5 sm:py-4 bg-[#fffafa] border-2 border-slate-100 rounded-xl sm:rounded-2xl text-[10px] sm:text-[11px] font-black uppercase tracking-wider outline-none focus:border-[#800020] focus:bg-white transition-all shadow-sm"
-                    value={productSearch}
-                    onChange={(e) => {
-                      setProductSearch(e.target.value);
-                      setShowResults(true);
-                    }}
-                  />
-                </div>
+              <div>
+                <label className="block text-[10px] sm:text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Quantidade</label>
+                <input required type="number" min="1" className="w-full p-4 bg-[#fffafa] border-2 border-slate-100 rounded-xl sm:rounded-2xl text-slate-950 font-black text-sm outline-none focus:border-[#800020] focus:bg-white transition-all" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
+              </div>
+              <button type="submit" disabled={!selectedProduct || !salonId || quantity <= 0} className="w-full bg-slate-950 text-white py-4 sm:py-5 rounded-xl sm:rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] sm:text-[11px] hover:bg-black mt-4 shadow-xl hover:shadow-2xl shadow-slate-200 transition-all active:scale-95 disabled:opacity-50">
+                Salvar Alterações
+              </button>
+            </>
+          ) : (
+            /* Envio de Múltiplos Consignados (Carrinho) */
+            <>
+              <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-100 space-y-4">
+                <label className="block text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Adicionar ao Envio</label>
+                
+                {selectedProduct ? (
+                  <div className="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm animate-in zoom-in duration-300 gap-4">
+                    <div className="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
+                      <CheckCircle2 className="text-[#800020] shrink-0 w-5 h-5" />
+                      <div className="overflow-hidden">
+                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Confirmar Produto</p>
+                        <p className="text-[11px] sm:text-xs font-bold text-slate-950 uppercase truncate">{selectedProduct.name}</p>
+                        <p className="text-[8px] font-bold text-slate-400 uppercase">Estoque: {selectedProduct.stockQuantity} un</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                      <div className="flex flex-col items-center">
+                        <span className="text-[8px] font-bold text-slate-400 uppercase mb-1">Qtd</span>
+                        <input type="number" min="1" className="w-14 sm:w-16 p-2 bg-slate-50 border border-slate-100 rounded-lg text-center font-bold text-sm outline-none focus:border-[#800020]/20" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
+                      </div>
+                      <button type="button" onClick={addItem} className="bg-[#800020] text-white px-4 sm:px-6 py-2 rounded-lg font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md">Adicionar</button>
+                      <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] p-1"><X size={20} /></button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className="relative">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <input
+                        type="text"
+                        placeholder="BUSCAR PRODUTO..."
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-xl text-[10px] sm:text-[11px] font-bold uppercase tracking-wider outline-none focus:border-[#800020]/30 transition-all shadow-sm"
+                        value={productSearch}
+                        onChange={(e) => {
+                          setProductSearch(e.target.value);
+                          setShowResults(true);
+                        }}
+                        onFocus={() => setShowResults(true)}
+                      />
+                    </div>
 
-                {showResults && filteredProducts.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-white border-2 border-slate-100 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[250px] overflow-y-auto custom-scrollbar">
-                    {filteredProducts.map(p => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => handleSelectProduct(p)}
-                        className="w-full text-left p-4 hover:bg-rose-50 flex items-center justify-between border-b border-rose-50 last:border-0 group transition-colors"
-                      >
-                        <div className="max-w-[75%]">
-                          <p className="text-[11px] sm:text-xs font-black text-slate-950 uppercase group-hover:text-[#800020] transition-colors truncate">{p.name}</p>
-                          <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase mt-0.5">Cód: {p.code} • {p.stockQuantity} un</p>
-                        </div>
-                      </button>
-                    ))}
+                    {showResults && filteredProducts.length > 0 && (
+                      <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[200px] overflow-y-auto custom-scrollbar">
+                        {filteredProducts.map(p => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => handleSelectProduct(p)}
+                            className="w-full text-left p-3 hover:bg-slate-50 flex items-center justify-between border-b border-slate-50 last:border-0 group transition-colors"
+                          >
+                            <div className="max-w-[75%]">
+                              <p className="text-[10px] sm:text-[11px] font-bold text-slate-800 uppercase group-hover:text-[#800020] transition-colors truncate">{p.name}</p>
+                              <p className="text-[8px] font-medium text-slate-400 uppercase mt-0.5">Ref: {p.code} • Estoque: {p.stockQuantity} un</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
 
-          <div>
-            <label className="block text-[10px] sm:text-[11px] font-black text-slate-500 uppercase mb-2 tracking-widest">Quantidade</label>
-            <input required type="number" min="1" className="w-full p-4 bg-[#fffafa] border-2 border-slate-100 rounded-xl sm:rounded-2xl text-slate-950 font-black text-sm outline-none focus:border-[#800020] focus:bg-white transition-all" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
-          </div>
+              <div className="space-y-3 pt-2">
+                <label className="block text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Produtos Selecionados</label>
+                {items.length === 0 && (
+                  <div className="py-8 text-center border border-dashed border-slate-200 rounded-xl bg-white/50">
+                    <p className="text-[9px] sm:text-[10px] font-bold text-slate-300 uppercase tracking-widest">Nenhum produto adicionado</p>
+                  </div>
+                )}
+                {items.map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm animate-in fade-in slide-in-from-left-4 duration-300">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="bg-slate-50 px-2 py-1 rounded text-slate-900 font-bold text-[10px] border border-slate-100 shrink-0">{item.quantity}x</div>
+                      <span className="font-bold text-[11px] sm:text-xs uppercase text-slate-800 tracking-tight truncate">{item.productName}</span>
+                    </div>
+                    <button type="button" onClick={() => removeItem(idx)} className="text-slate-300 hover:text-[#800020] transition-all hover:scale-110 p-1"><Trash2 size={16} /></button>
+                  </div>
+                ))}
+              </div>
 
-          <button type="submit" disabled={!selectedProduct || !salonId} className="w-full bg-slate-950 text-white py-4 sm:py-5 rounded-xl sm:rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] sm:text-[11px] hover:bg-black mt-4 shadow-xl hover:shadow-2xl shadow-slate-200 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100">
-            {editingConsignment ? 'Salvar Alterações' : 'Confirmar Envio'}
-          </button>
+              <button type="submit" disabled={items.length === 0 || !salonId} className="w-full bg-slate-950 text-white py-4 sm:py-5 rounded-xl sm:rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] sm:text-[11px] hover:bg-black mt-4 shadow-xl hover:shadow-2xl shadow-slate-200 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100">
+                Confirmar Envio ({items.length})
+              </button>
+            </>
+          )}
         </form>
       </Modal>
     </div>

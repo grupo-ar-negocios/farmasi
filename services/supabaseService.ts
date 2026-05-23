@@ -193,6 +193,23 @@ export const supabaseService = {
         return data as Consignment;
     },
 
+    createConsignments: async (consignments: Omit<Consignment, 'id'>[]) => {
+        const toInsert = consignments.map(c => ({
+            salon_id: c.salonId,
+            product_id: c.productId,
+            quantity: c.quantity,
+            sold_quantity: c.soldQuantity,
+            returned_quantity: c.returnedQuantity,
+            status: c.status,
+            date: c.date
+        }));
+        const { error } = await supabase.from('consignments').insert(toInsert);
+        if (error) {
+            console.error("Erro ao criar consignações em lote:", error);
+            throw error;
+        }
+    },
+
     updateConsignment: async (consignment: Consignment) => {
         const { error } = await supabase
             .from('consignments')
