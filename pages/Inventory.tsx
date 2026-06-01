@@ -17,6 +17,12 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
   const [searchTerm, setSearchTerm] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  // Replenishment states
+  const [isReplenishOpen, setIsReplenishOpen] = useState(false);
+  const [replenishProduct, setReplenishProduct] = useState<Product | null>(null);
+  const [replenishQty, setReplenishQty] = useState(0);
+  const [replenishCost, setReplenishCost] = useState(0);
+
   useEffect(() => {
     if (startOpen) openModal();
   }, [startOpen]);
@@ -59,6 +65,46 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
+  };
+
+  const openReplenishModal = (product: Product) => {
+    setReplenishProduct(product);
+    setReplenishQty(1);
+    setReplenishCost(product.costPrice);
+    setIsReplenishOpen(true);
+  };
+
+  const handleReplenishSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!replenishProduct) return;
+
+    const currentQty = replenishProduct.stockQuantity;
+    const currentCost = replenishProduct.costPrice;
+    const addedQty = Number(replenishQty) || 0;
+    const addedCost = Number(replenishCost) || 0;
+
+    if (addedQty <= 0) {
+      alert("A quantidade deve ser maior que zero!");
+      return;
+    }
+
+    const newQty = currentQty + addedQty;
+    let newCost = currentCost;
+    if (currentQty <= 0) {
+      newCost = addedCost;
+    } else {
+      newCost = ((currentQty * currentCost) + (addedQty * addedCost)) / newQty;
+    }
+
+    const updatedProduct: Product = {
+      ...replenishProduct,
+      stockQuantity: newQty,
+      costPrice: Number(newCost.toFixed(4)) // Keep decimal precision for average calculations
+    };
+
+    onEdit(updatedProduct);
+    setIsReplenishOpen(false);
+    setReplenishProduct(null);
   };
 
   const filteredProducts = products.filter(p =>
@@ -119,8 +165,9 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-slate-950 text-xs sm:text-sm whitespace-nowrap">R$ {product.sellPrice.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
                     <div className="flex justify-center gap-1 sm:gap-3 opacity-100 sm:opacity-20 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openModal(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Edit2 size={16} /></button>
-                      <button onClick={() => { if (confirm(`Excluir permanentemente "${product.name}"?`)) onDelete(product.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                      <button onClick={() => openReplenishModal(product)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Repor Estoque"><Package size={16} /></button>
+                      <button onClick={() => openModal(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar"><Edit2 size={16} /></button>
+                      <button onClick={() => { if (confirm(`Excluir permanentemente "${product.name}"?`)) onDelete(product.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors" title="Excluir"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -156,6 +203,77 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
           </div>
           <button type="submit" className="w-full bg-[#800020] text-white py-6 rounded-3xl font-black uppercase tracking-[0.2em] text-[11px] mt-8 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">
             Confirmar Alterações
+          </button>
+        </form>
+      </Modal>
+
+      <Modal isOpen={isReplenishOpen} onClose={() => setIsReplenishOpen(false)} title={`Repor Estoque: ${replenishProduct?.name}`}>
+        <form onSubmit={handleReplenishSubmit} className="space-y-6">
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200/60 pb-1">Estado Atual</p>
+            <div className="flex justify-between text-xs font-bold text-slate-700">
+              <span>Estoque Atual:</span>
+              <span>{replenishProduct?.stockQuantity} un</span>
+            </div>
+            <div className="flex justify-between text-xs font-bold text-slate-700">
+              <span>Custo Unitário Atual:</span>
+              <span>R$ {replenishProduct?.costPrice.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Quantidade Adicionada</label>
+            <input 
+              type="number" 
+              required 
+              min="1"
+              className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
+              value={replenishQty || ''} 
+              onChange={e => setReplenishQty(Number(e.target.value))} 
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Novo Custo Unitário de Compra (R$)</label>
+            <input 
+              type="number" 
+              step="0.01" 
+              required 
+              min="0.01"
+              className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
+              value={replenishCost || ''} 
+              onChange={e => setReplenishCost(Number(e.target.value))} 
+            />
+          </div>
+
+          {/* Real-time Preview calculations */}
+          {replenishProduct && (Number(replenishQty) > 0) && (
+            <div className="bg-emerald-50/60 border border-emerald-100 p-4 rounded-2xl space-y-2 animate-in zoom-in duration-300">
+              <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest border-b border-emerald-200 pb-1">Valores Projetados</p>
+              <div className="flex justify-between text-xs font-bold text-emerald-900">
+                <span>Novo Estoque Total:</span>
+                <span>{replenishProduct.stockQuantity + (Number(replenishQty) || 0)} un</span>
+              </div>
+              <div className="flex justify-between text-xs font-bold text-emerald-900">
+                <span>Novo Custo Médio:</span>
+                <span>
+                  R$ {(() => {
+                    const currentQty = replenishProduct.stockQuantity;
+                    const currentCost = replenishProduct.costPrice;
+                    const addedQty = Number(replenishQty) || 0;
+                    const addedCost = Number(replenishCost) || 0;
+                    const newQty = currentQty + addedQty;
+                    if (newQty <= 0) return 0;
+                    if (currentQty <= 0) return addedCost;
+                    return (((currentQty * currentCost) + (addedQty * addedCost)) / newQty);
+                  })().toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <button type="submit" className="w-full bg-[#800020] text-white py-6 rounded-3xl font-black uppercase tracking-[0.2em] text-[11px] mt-8 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all hover:-translate-y-0.5">
+            Confirmar Reposição
           </button>
         </form>
       </Modal>
