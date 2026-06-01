@@ -23,6 +23,7 @@ import { Clients } from './pages/Clients';
 import { Reports } from './pages/Reports';
 import { Analytics } from './pages/Analytics';
 import { Simulator } from './pages/Simulator';
+import { VitrineExpress } from './pages/VitrineExpress';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -503,6 +504,8 @@ function App() {
         return <Analytics sales={sales} products={products} clients={clients} salons={salons} />;
       case 'simulator':
         return <Simulator products={products} />;
+      case 'vitrine-express':
+        return <VitrineExpress products={products} sales={sales} />;
       default: return null;
     }
   };
