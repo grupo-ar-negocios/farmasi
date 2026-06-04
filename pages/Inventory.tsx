@@ -79,6 +79,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
     if (!replenishProduct) return;
 
     const currentQty = replenishProduct.stockQuantity;
+    const consignedQty = replenishProduct.consignedQuantity;
     const currentCost = replenishProduct.costPrice;
     const addedQty = Number(replenishQty) || 0;
     const addedCost = Number(replenishCost) || 0;
@@ -88,12 +89,15 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
       return;
     }
 
+    const currentTotalOwned = currentQty + consignedQty;
     const newQty = currentQty + addedQty;
+    const newTotalOwned = currentTotalOwned + addedQty;
+
     let newCost = currentCost;
-    if (currentQty <= 0) {
+    if (currentTotalOwned <= 0) {
       newCost = addedCost;
     } else {
-      newCost = ((currentQty * currentCost) + (addedQty * addedCost)) / newQty;
+      newCost = ((currentTotalOwned * currentCost) + (addedQty * addedCost)) / newTotalOwned;
     }
 
     const updatedProduct: Product = {
@@ -212,10 +216,18 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200/60 pb-1">Estado Atual</p>
             <div className="flex justify-between text-xs font-bold text-slate-700">
-              <span>Estoque Atual:</span>
+              <span>Estoque Central:</span>
               <span>{replenishProduct?.stockQuantity} un</span>
             </div>
             <div className="flex justify-between text-xs font-bold text-slate-700">
+              <span>Estoque Consignado:</span>
+              <span>{replenishProduct?.consignedQuantity} un</span>
+            </div>
+            <div className="flex justify-between text-xs font-bold text-slate-700">
+              <span>Total Possuído:</span>
+              <span>{(replenishProduct?.stockQuantity || 0) + (replenishProduct?.consignedQuantity || 0)} un</span>
+            </div>
+            <div className="flex justify-between text-xs font-bold text-slate-700 pt-1 border-t border-slate-200/60">
               <span>Custo Unitário Atual:</span>
               <span>R$ {replenishProduct?.costPrice.toFixed(2)}</span>
             </div>
@@ -228,7 +240,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
               required 
               min="1"
               className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
-              value={replenishQty || ''} 
+              value={replenishQty} 
               onChange={e => setReplenishQty(Number(e.target.value))} 
             />
           </div>
@@ -239,9 +251,9 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
               type="number" 
               step="0.01" 
               required 
-              min="0.01"
+              min="0"
               className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
-              value={replenishCost || ''} 
+              value={replenishCost} 
               onChange={e => setReplenishCost(Number(e.target.value))} 
             />
           </div>
@@ -251,21 +263,31 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
             <div className="bg-emerald-50/60 border border-emerald-100 p-4 rounded-2xl space-y-2 animate-in zoom-in duration-300">
               <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest border-b border-emerald-200 pb-1">Valores Projetados</p>
               <div className="flex justify-between text-xs font-bold text-emerald-900">
-                <span>Novo Estoque Total:</span>
+                <span>Novo Estoque Central:</span>
                 <span>{replenishProduct.stockQuantity + (Number(replenishQty) || 0)} un</span>
               </div>
               <div className="flex justify-between text-xs font-bold text-emerald-900">
+                <span>Estoque Consignado:</span>
+                <span>{replenishProduct.consignedQuantity} un</span>
+              </div>
+              <div className="flex justify-between text-xs font-bold text-emerald-900">
+                <span>Novo Total Possuído:</span>
+                <span>{replenishProduct.stockQuantity + replenishProduct.consignedQuantity + (Number(replenishQty) || 0)} un</span>
+              </div>
+              <div className="flex justify-between text-xs font-bold text-emerald-900 pt-1 border-t border-emerald-200">
                 <span>Novo Custo Médio:</span>
                 <span>
                   R$ {(() => {
                     const currentQty = replenishProduct.stockQuantity;
+                    const consignedQty = replenishProduct.consignedQuantity;
                     const currentCost = replenishProduct.costPrice;
                     const addedQty = Number(replenishQty) || 0;
                     const addedCost = Number(replenishCost) || 0;
-                    const newQty = currentQty + addedQty;
-                    if (newQty <= 0) return 0;
-                    if (currentQty <= 0) return addedCost;
-                    return (((currentQty * currentCost) + (addedQty * addedCost)) / newQty);
+                    const currentTotalOwned = currentQty + consignedQty;
+                    const newTotalOwned = currentTotalOwned + addedQty;
+                    if (newTotalOwned <= 0) return 0;
+                    if (currentTotalOwned <= 0) return addedCost;
+                    return (((currentTotalOwned * currentCost) + (addedQty * addedCost)) / newTotalOwned);
                   })().toFixed(2)}
                 </span>
               </div>
