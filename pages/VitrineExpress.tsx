@@ -218,32 +218,50 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
   // Generate WhatsApp Text format
   const whatsAppText = useMemo(() => {
     if (suggestions.length === 0) return '';
-    let text = `✨ *OFERTAS DE HOJE* ✨\n\n`;
+    let text = `✨ *OFERTAS DE HOJE - FLUXO BEAUTY* ✨\n`;
+    text += `✨ _Produtos selecionados com descontos especiais para você!_\n\n`;
 
     suggestions.forEach(item => {
       const hasDiscount = item.promoPrice < item.originalPrice;
+      const savings = item.originalPrice - item.promoPrice;
       const priceText = hasDiscount
         ? `de ~R$ ${item.originalPrice.toFixed(2)}~ por *R$ ${item.promoPrice.toFixed(2)}*`
         : `*R$ ${item.originalPrice.toFixed(2)}*`;
 
       let label = '';
-      if (item.tag === 'parado') label = '🔥 _Giro de Estoque!_';
-      else if (item.tag === 'estoque_alto') label = '⚡ _Promoção Especial_';
-      else if (item.tag === 'margem_boa') label = '🎁 _Oferta Imperdível!_';
-      else label = '✨ _Novidade Quente!_';
+      if (item.tag === 'mais_vendido') label = '🔥 _Mais Vendido_';
+      else if (item.tag === 'parado') label = '🚀 _Promoção Relâmpago_';
+      else if (item.tag === 'estoque_alto') label = '💎 _Oportunidade do Dia_';
+      else label = '🎁 _Oferta Exclusiva_';
 
-      const stockText = item.stockQuantity === 1 ? 'Última unidade!' : `${item.stockQuantity} un disponíveis`;
+      let stockText = '';
+      if (item.stockQuantity === 1) {
+        stockText = '🔴 Última Unidade!';
+      } else if (item.stockQuantity === 2) {
+        stockText = '🟠 Restam apenas 2 unidades!';
+      } else if (item.stockQuantity <= 5) {
+        stockText = '🟡 Estoque Limitado!';
+      } else {
+        stockText = `📦 ${item.stockQuantity} un disponíveis`;
+      }
 
-      text += `${item.emoji} *${item.productName}*\n`;
-      text += `💰 ${priceText}\n`;
-      text += `🏷️ ${label} • 📦 ${stockText}\n\n`;
+      text += `${item.emoji} *${item.productName.toUpperCase()}*\n`;
+      text += `💰 ${priceText}`;
+      if (hasDiscount && savings > 0) {
+        text += ` (Economize R$ ${savings.toFixed(2)})`;
+      }
+      text += `\n`;
+      text += `🏷️ ${label} • ${stockText}\n\n`;
       text += `━━━━━━━━━━\n\n`;
     });
 
     text += `🚚 *Pronta entrega para toda a região!*\n`;
-    text += `💖 *Garanta o seu! Me chama no WhatsApp!*`;
+    text += `✨ *Produtos disponíveis para envio imediato!*\n`;
+    text += `📦 *Estoque atualizado em tempo real!*\n\n`;
+    text += `💖 *Faça seu pedido enquanto ainda há disponibilidade!*`;
     return text;
   }, [suggestions]);
+
 
   // Copy text handler
   const handleCopyText = () => {
@@ -260,17 +278,38 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Canvas size
+    // Canvas size (increased height to prevent crowding and fit elegant footer/header)
     canvas.width = 800;
-    canvas.height = 1200;
+    canvas.height = 1300;
 
     // Background gradient
     const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, '#3A000D'); // Dark Wine
-    grad.addColorStop(0.5, '#5C0016'); // Wine
-    grad.addColorStop(1, '#1A0006'); // Deep dark
+    grad.addColorStop(0, '#2D0B14'); // Rich dark wine
+    grad.addColorStop(0.5, '#420F1D'); // Deep wine
+    grad.addColorStop(1, '#1A0409'); // Darkest wine
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Helper to draw 4-pointed sparkle stars
+    const drawSparkle = (cx: number, cy: number, size: number) => {
+      ctx.fillStyle = '#D4AF37';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - size);
+      ctx.quadraticCurveTo(cx, cy, cx + size, cy);
+      ctx.quadraticCurveTo(cx, cy, cx, cy + size);
+      ctx.quadraticCurveTo(cx, cy, cx - size, cy);
+      ctx.quadraticCurveTo(cx, cy, cx, cy - size);
+      ctx.closePath();
+      ctx.fill();
+    };
+
+    // Draw header sparkle details
+    drawSparkle(75, 80, 10);
+    drawSparkle(725, 80, 10);
+    drawSparkle(85, 140, 15);
+    drawSparkle(715, 140, 15);
+    drawSparkle(180, 115, 8);
+    drawSparkle(620, 115, 8);
 
     // Decorative Gold border
     ctx.strokeStyle = '#D4AF37'; // Gold
@@ -278,7 +317,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
     ctx.strokeRect(25, 25, canvas.width - 50, canvas.height - 50);
 
     // Inner thin border
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.35)';
     ctx.lineWidth = 2;
     ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
 
@@ -291,138 +330,421 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
 
     // Main Title
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '900 42px sans-serif';
+    ctx.font = '900 46px sans-serif';
     ctx.letterSpacing = '2px';
-    ctx.fillText('OFERTAS DE HOJE', canvas.width / 2, 145);
+    ctx.fillText('OFERTAS DE HOJE', canvas.width / 2, 140);
 
-    // Subtitle Date
-    const todayStr = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.letterSpacing = '4px';
-    ctx.fillText(todayStr, canvas.width / 2, 185);
+    // Header Subtitle (New requirement)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.font = 'italic 500 14px sans-serif';
+    ctx.letterSpacing = '1px';
+    ctx.fillText('Produtos selecionados automaticamente com as melhores oportunidades do dia', canvas.width / 2, 175);
+
+    // Subtitle Date Pill with Calendar Icon
+    const todayStr = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+    const dateText = `📅 ${todayStr}`;
+    ctx.font = 'bold 13px sans-serif';
+    ctx.letterSpacing = '3px';
+    const pillWidth = ctx.measureText(dateText).width + 40;
+    const pillHeight = 36;
+    const pillX = (canvas.width - pillWidth) / 2;
+    const pillY = 202;
+
+    // Draw pill background
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.08)';
+    ctx.strokeStyle = '#D4AF37';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 18);
+    } else {
+      ctx.arc(pillX + 18, pillY + 18, 18, Math.PI, Math.PI * 1.5);
+      ctx.lineTo(pillX + pillWidth - 18, pillY);
+      ctx.arc(pillX + pillWidth - 18, pillY + 18, 18, Math.PI * 1.5, 0);
+      ctx.lineTo(pillX + pillWidth, pillY + pillHeight - 18);
+      ctx.arc(pillX + pillWidth - 18, pillY + pillHeight - 18, 18, 0, Math.PI * 0.5);
+      ctx.lineTo(pillX + 18, pillY + pillHeight);
+      ctx.arc(pillX + 18, pillY + pillHeight - 18, 18, Math.PI * 0.5, Math.PI);
+      ctx.closePath();
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw Date Text
+    ctx.fillStyle = '#D4AF37';
+    ctx.textAlign = 'center';
+    ctx.fillText(dateText, canvas.width / 2, pillY + 22);
 
     // Divider Line
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(100, 220);
-    ctx.lineTo(canvas.width - 100, 220);
+    ctx.moveTo(150, 260);
+    ctx.lineTo(canvas.width - 150, 260);
     ctx.stroke();
 
     // Render items
-    let startY = 270;
-    const itemHeight = 185;
+    let startY = 285;
+    const itemHeight = 195;
+    const itemGap = 15;
 
     suggestions.forEach((item, idx) => {
-      const y = startY + idx * itemHeight;
+      const y = startY + idx * (itemHeight + itemGap);
+      const cardWidth = 660;
+      const cardX = 70;
 
       // Draw item card background
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.fillRect(80, y, canvas.width - 160, itemHeight - 20);
+      const cardGrad = ctx.createLinearGradient(cardX, y, cardX + cardWidth, y);
+      cardGrad.addColorStop(0, '#420F1D'); // Solid wine
+      cardGrad.addColorStop(1, '#2D0B14'); // Rich dark wine
+      ctx.fillStyle = cardGrad;
+      
+      // Draw rounded card
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(cardX, y, cardWidth, itemHeight, 20);
+      } else {
+        ctx.arc(cardX + 20, y + 20, 20, Math.PI, Math.PI * 1.5);
+        ctx.lineTo(cardX + cardWidth - 20, y);
+        ctx.arc(cardX + cardWidth - 20, y + 20, 20, Math.PI * 1.5, 0);
+        ctx.lineTo(cardX + cardWidth, y + itemHeight - 20);
+        ctx.arc(cardX + cardWidth - 20, y + itemHeight - 20, 20, 0, Math.PI * 0.5);
+        ctx.lineTo(cardX + 20, y + itemHeight);
+        ctx.arc(cardX + 20, y + itemHeight - 20, 20, Math.PI * 0.5, Math.PI);
+        ctx.closePath();
+      }
+      ctx.fill();
 
       // Card border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(80, y, canvas.width - 160, itemHeight - 20);
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
 
-      // Emoji (using default font that supports emojis)
-      ctx.font = '40px sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(item.emoji, 115, y + 78);
+      // Left Circle Container for Icons (High Contrast)
+      const circleX = cardX + 65;
+      const circleY = y + (itemHeight / 2);
+      const radius = 45;
 
-      // Product Name
+      ctx.fillStyle = '#FFFDF9'; // Soft cream
+      ctx.beginPath();
+      ctx.arc(circleX, circleY, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#D4AF37'; // Gold
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Draw emoji inside the circle
+      ctx.font = '45px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.emoji, circleX, circleY + 2);
+
+      // Reset baseline
+      ctx.textBaseline = 'alphabetic';
+
+      // Product details
+      const infoX = cardX + 135;
+
+      // 1. Product Name
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 24px sans-serif';
+      ctx.font = '900 20px sans-serif';
       ctx.textAlign = 'left';
       
-      // Truncate name if it's too long
       let nameToDraw = item.productName.toUpperCase();
-      if (ctx.measureText(nameToDraw).width > 420) {
-        nameToDraw = nameToDraw.slice(0, 25) + '...';
+      if (ctx.measureText(nameToDraw).width > 240) {
+        nameToDraw = nameToDraw.slice(0, 22) + '...';
       }
-      ctx.fillText(nameToDraw, 185, y + 55);
+      ctx.fillText(nameToDraw, infoX, y + 42);
 
-      // Tag Label
+      // 2. Promotional Badge (Tag Label)
       let badgeText = '';
-      let badgeColor = '#D4AF37'; // Gold default
-      if (item.tag === 'parado') {
-        badgeText = '🔥 QUEIMA DE ESTOQUE';
-        badgeColor = '#ef4444'; // Red
+      let badgeColor = '#D4AF37';
+      if (item.tag === 'mais_vendido') {
+        badgeText = '🔥 MAIS VENDIDO';
+        badgeColor = '#EF4444'; // Red
+      } else if (item.tag === 'parado') {
+        badgeText = '🚀 PROMOÇÃO RELÂMPAGO';
+        badgeColor = '#EC4899'; // Pink/Magenta
       } else if (item.tag === 'estoque_alto') {
-        badgeText = '⚡ SUPER DESCONTO';
-        badgeColor = '#3b82f6'; // Blue
-      } else if (item.tag === 'margem_boa') {
-        badgeText = '🎁 OFERTA DO DIA';
-        badgeColor = '#f59e0b'; // Amber
+        badgeText = '💎 OPORTUNIDADE DO DIA';
+        badgeColor = '#3B82F6'; // Blue
       } else {
-        badgeText = '✨ MAIS PROCURADO';
-        badgeColor = '#10b981'; // Emerald
+        badgeText = '🎁 OFERTA EXCLUSIVA';
+        badgeColor = '#10B981'; // Emerald Green
       }
+
+      ctx.font = '900 10px sans-serif';
+      ctx.letterSpacing = '1px';
+      const badgeTextWidth = ctx.measureText(badgeText).width;
+      const badgeW = badgeTextWidth + 16;
+      const badgeH = 22;
+      const badgeY = y + 54;
 
       ctx.fillStyle = badgeColor;
-      ctx.font = '900 11px sans-serif';
-      ctx.letterSpacing = '1px';
-      ctx.fillText(badgeText, 185, y + 84);
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(infoX, badgeY, badgeW, badgeH, 6);
+      } else {
+        ctx.rect(infoX, badgeY, badgeW, badgeH);
+      }
+      ctx.fill();
 
-      // Prices
-      const hasDiscount = item.promoPrice < item.originalPrice;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.fillText(badgeText, infoX + (badgeW / 2), badgeY + 14);
 
-      if (hasDiscount) {
-        // Original price
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.font = '500 18px sans-serif';
-        const origText = `de R$ ${item.originalPrice.toFixed(2)}`;
-        ctx.fillText(origText, 185, y + 125);
+      // 3. Prices Hierarchy
+      const priceY = y + 105;
+      ctx.textAlign = 'left';
 
-        // Strike through original price
-        const origWidth = ctx.measureText(origText).width;
-        ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)'; // Red strike
-        ctx.lineWidth = 2;
+      // Original price (Strike-through)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.font = 'bold 14px sans-serif';
+      const origText = `de R$ ${item.originalPrice.toFixed(2)}`;
+      ctx.fillText(origText, infoX, priceY);
+
+      const origWidth = ctx.measureText(origText).width;
+      ctx.strokeStyle = '#EF4444';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(infoX, priceY - 5);
+      ctx.lineTo(infoX + origWidth, priceY - 5);
+      ctx.stroke();
+
+      // Economy Highlight
+      const savings = item.originalPrice - item.promoPrice;
+      if (savings > 0) {
+        const economyText = `ECONOMIZE R$ ${savings.toFixed(2)}`;
+        ctx.font = '900 10px sans-serif';
+        ctx.letterSpacing = '1px';
+        const econW = ctx.measureText(economyText).width + 16;
+        const econH = 20;
+        const econY = y + 130;
+
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+        ctx.strokeStyle = '#10B981';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(185, y + 119);
-        ctx.lineTo(185 + origWidth, y + 119);
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(infoX, econY, econW, econH, 6);
+        } else {
+          ctx.rect(infoX, econY, econW, econH);
+        }
+        ctx.fill();
         ctx.stroke();
 
-        // Promo Price
-        ctx.fillStyle = '#D4AF37'; // Gold
-        ctx.font = '900 28px sans-serif';
-        ctx.fillText(`por R$ ${item.promoPrice.toFixed(2)}`, 185 + origWidth + 15, y + 127);
-      } else {
-        ctx.fillStyle = '#D4AF37'; // Gold
-        ctx.font = '900 28px sans-serif';
-        ctx.fillText(`R$ ${item.originalPrice.toFixed(2)}`, 185, y + 127);
+        ctx.fillStyle = '#10B981';
+        ctx.textAlign = 'center';
+        ctx.fillText(economyText, infoX + (econW / 2), econY + 13);
       }
 
-      // Stock Info (Align Right)
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'right';
-      const stockText = item.stockQuantity === 1 ? 'ÚLTIMA UNIDADE' : `${item.stockQuantity} DISPONÍVEIS`;
-      ctx.fillText(stockText, canvas.width - 110, y + 122);
+      // 4. Promo Price Box on the Right (High Prominence)
+      const boxX = cardX + 380;
+      const boxY = y + 25;
+      const boxW = 160;
+      const boxH = 145;
+
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.08)';
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(boxX, boxY, boxW, boxH, 14);
+      } else {
+        ctx.rect(boxX, boxY, boxW, boxH);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '900 10px sans-serif';
+      ctx.letterSpacing = '2px';
+      ctx.textAlign = 'center';
+      ctx.fillText('POR APENAS', boxX + (boxW / 2), boxY + 28);
+
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = '900 28px sans-serif';
+      ctx.fillText(`R$ ${item.promoPrice.toFixed(2)}`, boxX + (boxW / 2), boxY + 70);
+
+      const ribbonText = 'DESCONTO ESPECIAL';
+      ctx.font = '900 8px sans-serif';
+      ctx.letterSpacing = '1px';
+      const ribW = ctx.measureText(ribbonText).width + 12;
+      const ribH = 16;
+      const ribX = boxX + (boxW - ribW) / 2;
+      const ribY = boxY + 86;
+
+      ctx.fillStyle = '#D4AF37';
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(ribX, ribY, ribW, ribH, 4);
+      } else {
+        ctx.rect(ribX, ribY, ribW, ribH);
+      }
+      ctx.fill();
+
+      ctx.fillStyle = '#2D0B14';
+      ctx.textAlign = 'center';
+      ctx.fillText(ribbonText, boxX + (boxW / 2), ribY + 11);
+
+      if (item.originalPrice > 0) {
+        const discountPercent = Math.round(((item.originalPrice - item.promoPrice) / item.originalPrice) * 100);
+        if (discountPercent > 0) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 11px sans-serif';
+          ctx.fillText(`-${discountPercent}% OFF`, boxX + (boxW / 2), boxY + 124);
+        }
+      }
+
+      // 5. Stock Box on the Rightmost (Stock Urgency)
+      const stockBoxX = cardX + 555;
+      const stockBoxY = y + 25;
+      const stockBoxW = 90;
+      const stockBoxH = 145;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(stockBoxX, stockBoxY, stockBoxW, stockBoxH, 14);
+      } else {
+        ctx.rect(stockBoxX, stockBoxY, stockBoxW, stockBoxH);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      let stockEmoji = '📦';
+      let line1Text = '';
+      let line2Text = '';
+      let textColor = 'rgba(255, 255, 255, 0.6)';
+
+      if (item.stockQuantity === 1) {
+        stockEmoji = '🔴';
+        line1Text = 'ÚLTIMA';
+        line2Text = 'UNIDADE';
+        textColor = '#EF4444';
+      } else if (item.stockQuantity === 2) {
+        stockEmoji = '🟠';
+        line1Text = 'RESTAM';
+        line2Text = 'APENAS 2';
+        textColor = '#F59E0B';
+      } else if (item.stockQuantity > 2 && item.stockQuantity <= 5) {
+        stockEmoji = '🟡';
+        line1Text = 'ESTOQUE';
+        line2Text = 'LIMITADO';
+        textColor = '#EAB308';
+      } else {
+        stockEmoji = '📦';
+        line1Text = `${item.stockQuantity}`;
+        line2Text = 'DISPONÍVEIS';
+        textColor = 'rgba(255, 255, 255, 0.7)';
+      }
+
+      ctx.font = '28px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(stockEmoji, stockBoxX + (stockBoxW / 2), stockBoxY + 45);
+
+      ctx.fillStyle = textColor;
+      ctx.font = '900 9px sans-serif';
+      ctx.letterSpacing = '1px';
+      ctx.fillText(line1Text, stockBoxX + (stockBoxW / 2), stockBoxY + 86);
+      ctx.fillText(line2Text, stockBoxX + (stockBoxW / 2), stockBoxY + 102);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.fillText('EM ESTOQUE', stockBoxX + (stockBoxW / 2), stockBoxY + 124);
     });
 
-    // Footer Block
+    // Footer Block (3 differential columns)
+    const footerY = 1135;
+    const footerW = 660;
+    const footerX = 70;
+    const footerH = 65;
+
     ctx.fillStyle = 'rgba(212, 175, 55, 0.05)';
-    ctx.fillRect(80, 1030, canvas.width - 160, 90);
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(footerX, footerY, footerW, footerH, 12);
+    } else {
+      ctx.rect(footerX, footerY, footerW, footerH);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Dividers
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(80, 1030, canvas.width - 160, 90);
+    ctx.beginPath();
+    ctx.moveTo(290, footerY + 10);
+    ctx.lineTo(290, footerY + footerH - 10);
+    ctx.moveTo(510, footerY + 10);
+    ctx.lineTo(510, footerY + footerH - 10);
+    ctx.stroke();
 
+    // Column 1
     ctx.fillStyle = '#D4AF37';
-    ctx.font = '900 13px sans-serif';
+    ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.letterSpacing = '4px';
-    ctx.fillText('🚚 PRONTA ENTREGA EM TODA A REGIÃO', canvas.width / 2, 1067);
+    ctx.fillText('🚚 PRONTA ENTREGA', 180, footerY + 28);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '500 9px sans-serif';
+    ctx.fillText('Envio rápido para sua região', 180, footerY + 44);
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 15px sans-serif';
+    // Column 2
+    ctx.fillStyle = '#D4AF37';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText('✨ ENVIO IMEDIATO', 400, footerY + 28);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '500 9px sans-serif';
+    ctx.fillText('Produtos prontos para envio', 400, footerY + 44);
+
+    // Column 3
+    ctx.fillStyle = '#D4AF37';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText('📦 ESTOQUE REAL', 620, footerY + 28);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '500 9px sans-serif';
+    ctx.fillText('Atualizado em tempo real', 620, footerY + 44);
+
+    // Call to Action (CTA) Pill Button at the very bottom
+    const ctaY = 1220;
+    ctx.fillStyle = '#FFFDF9';
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(100, ctaY, 600, 46, 23);
+    } else {
+      ctx.rect(100, ctaY, 600, 46);
+    }
+    ctx.fill();
+
+    // Circle decor inside CTA Button
+    ctx.fillStyle = '#2D0B14';
+    ctx.beginPath();
+    ctx.arc(140, ctaY + 23, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Heart icon inside Circle
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('💖', 140, ctaY + 23);
+
+    // CTA Text
+    ctx.fillStyle = '#2D0B14';
+    ctx.font = '900 12px sans-serif';
     ctx.letterSpacing = '1px';
-    ctx.fillText('💬 ENVIE UMA MENSAGEM NO WHATSAPP E GARANTA O SEU!', canvas.width / 2, 1100);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('FAÇA SEU PEDIDO ENQUANTO AINDA HÁ DISPONIBILIDADE!', 415, ctaY + 27);
 
     // Save image preview data url
     setImagePreview(canvas.toDataURL('image/png'));
   };
+
 
   // Re-draw whenever suggestions change
   useEffect(() => {
