@@ -268,11 +268,7 @@ function App() {
 
   const handleEditProduct = async (prod: Product) => {
     try {
-      if (prod.stockQuantity <= 0 && prod.consignedQuantity <= 0) {
-        await supabaseService.deleteProduct(prod.id);
-      } else {
-        await supabaseService.updateProduct(prod);
-      }
+      await supabaseService.updateProduct(prod);
       refreshData();
     } catch (e) {
       console.error("Erro ao editar produto", e);
@@ -327,25 +323,6 @@ function App() {
       });
 
       await Promise.all(updates);
-
-      // 3. Limpeza de produtos com estoque zerado
-      const uniqueProductIds = [...new Set(sale.items.map(i => i.productId))];
-      for (const productId of uniqueProductIds) {
-        const p = products.find(prod => prod.id === productId);
-        if (p) {
-          const totalSoldInSale = sale.items
-            .filter(i => i.productId === productId)
-            .reduce((sum, i) => sum + i.quantity, 0);
-
-          const finalStock = sale.type === 'direct' ? p.stockQuantity - totalSoldInSale : p.stockQuantity;
-          const finalConsigned = sale.type === 'consignment' ? p.consignedQuantity - totalSoldInSale : p.consignedQuantity;
-
-          if (finalStock <= 0 && finalConsigned <= 0) {
-            await supabaseService.deleteProduct(p.id);
-          }
-        }
-      }
-
       refreshData();
     } catch (e) {
       console.error("Erro ao adicionar venda:", e);

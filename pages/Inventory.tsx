@@ -16,6 +16,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'out_of_stock'>('all');
 
   // Replenishment states
   const [isReplenishOpen, setIsReplenishOpen] = useState(false);
@@ -111,10 +112,20 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
     setReplenishProduct(null);
   };
 
-  const filteredProducts = products.filter(p =>
-    normalizeString(p.name).includes(normalizeString(searchTerm)) ||
-    normalizeString(p.code).includes(normalizeString(searchTerm))
-  );
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = normalizeString(p.name).includes(normalizeString(searchTerm)) ||
+      normalizeString(p.code).includes(normalizeString(searchTerm));
+    
+    if (!matchesSearch) return false;
+    
+    if (stockFilter === 'in_stock') {
+      return p.stockQuantity > 0;
+    }
+    if (stockFilter === 'out_of_stock') {
+      return p.stockQuantity <= 0;
+    }
+    return true;
+  });
 
   return (
     <div className="space-y-6 pb-20 sm:pb-0">
@@ -138,6 +149,39 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
         />
       </div>
 
+      <div className="flex flex-wrap gap-2 pt-2">
+        <button
+          onClick={() => setStockFilter('all')}
+          className={`px-5 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all border ${
+            stockFilter === 'all'
+              ? 'bg-[#800020] text-white border-[#800020] shadow-sm'
+              : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50 hover:text-slate-700'
+          }`}
+        >
+          🗂️ Todos os produtos
+        </button>
+        <button
+          onClick={() => setStockFilter('in_stock')}
+          className={`px-5 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all border ${
+            stockFilter === 'in_stock'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+              : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50 hover:text-slate-700'
+          }`}
+        >
+          🟢 Em estoque
+        </button>
+        <button
+          onClick={() => setStockFilter('out_of_stock')}
+          className={`px-5 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all border ${
+            stockFilter === 'out_of_stock'
+              ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+              : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50 hover:text-slate-700'
+          }`}
+        >
+          🔴 Sem estoque
+        </button>
+      </div>
+
       <div className="bg-white rounded-2xl sm:rounded-[2.5rem] border border-slate-50 shadow-sm overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left min-w-[700px] sm:min-w-0">
@@ -158,9 +202,15 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
                   <td className="px-5 sm:px-8 py-4 sm:py-6 font-bold text-slate-900 text-[11px] sm:text-xs tracking-tight whitespace-nowrap">{product.code}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 font-bold text-slate-900 text-[11px] sm:text-xs uppercase tracking-tight">{product.name}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center whitespace-nowrap">
-                    <span className={`font-bold text-[9px] sm:text-[10px] px-3 sm:px-4 py-1.5 rounded-full uppercase ${product.stockQuantity <= 3 ? 'bg-red-50 text-[#800020]' : 'bg-slate-50 text-slate-600'}`}>
-                      {product.stockQuantity} un
-                    </span>
+                    {product.stockQuantity === 0 ? (
+                      <span className="font-black text-[9px] sm:text-[10px] px-3 sm:px-4 py-1.5 rounded-full uppercase bg-red-50 text-[#800020] border border-red-100 animate-pulse">
+                        🔴 Sem Estoque (0 un)
+                      </span>
+                    ) : (
+                      <span className={`font-bold text-[9px] sm:text-[10px] px-3 sm:px-4 py-1.5 rounded-full uppercase ${product.stockQuantity <= 3 ? 'bg-red-50 text-[#800020]' : 'bg-slate-50 text-slate-600'}`}>
+                        {product.stockQuantity} un
+                      </span>
+                    )}
                   </td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center font-bold text-slate-900 text-xs whitespace-nowrap">
                     <span className="bg-blue-50/50 text-blue-600 px-3 sm:px-4 py-1.5 rounded-full uppercase text-[9px] sm:text-[10px]">{product.consignedQuantity} un</span>

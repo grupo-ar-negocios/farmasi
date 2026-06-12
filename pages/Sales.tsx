@@ -56,14 +56,18 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
 
   const baseAvailableProducts = useMemo(() => {
     if (saleType === 'direct') {
-      return products.map(p => ({ ...p, displayQuantity: p.stockQuantity }));
+      return products
+        .map(p => ({ ...p, displayQuantity: p.stockQuantity }))
+        .filter(p => p.displayQuantity > 0);
     } else {
       if (!originSalonId) return [];
-      return products.map(p => {
-        const activeConsignments = consignments.filter(c => String(c.salonId) === String(originSalonId) && String(c.productId) === String(p.id));
-        const totalAvailable = activeConsignments.reduce((sum, c) => sum + (c.quantity - c.soldQuantity - c.returnedQuantity), 0);
-        return { ...p, displayQuantity: totalAvailable };
-      });
+      return products
+        .map(p => {
+          const activeConsignments = consignments.filter(c => String(c.salonId) === String(originSalonId) && String(c.productId) === String(p.id));
+          const totalAvailable = activeConsignments.reduce((sum, c) => sum + (c.quantity - c.soldQuantity - c.returnedQuantity), 0);
+          return { ...p, displayQuantity: totalAvailable };
+        })
+        .filter(p => p.displayQuantity > 0);
     }
   }, [saleType, originSalonId, products, consignments]);
 
