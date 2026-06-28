@@ -62,15 +62,15 @@ export const Clients: React.FC<ClientsProps> = ({ clients, sales, onAdd, onEdit,
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <Users className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Clientes
+          <Users className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Clientes
         </h2>
         <button onClick={handleOpenAdd} className="w-full sm:w-auto bg-[#800020] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black uppercase text-[9px] sm:text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all active:scale-95">
-          <Plus size={18} /> Novo Cliente
+          <Plus size={18} className="shrink-0" /> Novo Cliente
         </button>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+        <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" />
         <input
           type="text"
           placeholder="PESQUISAR CLIENTE..."
@@ -84,8 +84,8 @@ export const Clients: React.FC<ClientsProps> = ({ clients, sales, onAdd, onEdit,
         {filteredClients.map(client => (
           <div key={client.id} className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group relative overflow-hidden">
             <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all">
-              <button onClick={() => handleOpenEdit(client)} className="p-2.5 sm:p-3 text-blue-600 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors"><Edit2 size={16} /></button>
-              <button onClick={() => { if (confirm(`Excluir permanentemente o cliente "${client.name}"?`)) onDelete(client.id); }} className="p-2.5 sm:p-3 text-[#800020] bg-red-50/50 rounded-xl hover:bg-red-50 transition-colors"><Trash2 size={16} /></button>
+              <button onClick={() => handleOpenEdit(client)} className="p-2.5 sm:p-3 text-blue-600 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors"><Edit2 size={16} className="shrink-0" /></button>
+              <button onClick={() => { if (confirm(`Excluir permanentemente o cliente "${client.name}"?`)) onDelete(client.id); }} className="p-2.5 sm:p-3 text-[#800020] bg-red-50/50 rounded-xl hover:bg-red-50 transition-colors"><Trash2 size={16} className="shrink-0" /></button>
             </div>
 
             <div className="flex items-center gap-4 sm:gap-5 mb-6 sm:mb-8">
@@ -113,7 +113,7 @@ export const Clients: React.FC<ClientsProps> = ({ clients, sales, onAdd, onEdit,
               onClick={() => setHistoryClient(client)}
               className="w-full mt-5 sm:mt-6 py-3.5 sm:py-4 bg-slate-950 text-white rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#800020] transition-colors active:scale-95"
             >
-              <History size={14} /> Histórico de Compras
+              <History size={14} className="shrink-0" /> Histórico de Compras
             </button>
           </div>
         ))}
@@ -157,7 +157,7 @@ export const Clients: React.FC<ClientsProps> = ({ clients, sales, onAdd, onEdit,
                 <div key={sale.id} className="bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100">
                   <div className="flex justify-between items-center mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-slate-200/50">
                     <div className="flex items-center gap-2 text-slate-900 font-black text-[9px] sm:text-[10px] uppercase">
-                      <Calendar size={14} className="text-[#800020]" />
+                      <Calendar size={14} className="text-[#800020] shrink-0" />
                       {new Date(sale.date).toLocaleDateString()}
                     </div>
                     <div className="text-[#800020] font-black text-xs sm:text-sm">
@@ -169,7 +169,7 @@ export const Clients: React.FC<ClientsProps> = ({ clients, sales, onAdd, onEdit,
                       <div key={idx} className="flex justify-between items-center gap-4">
                         <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
                           <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg border border-slate-100 flex items-center justify-center text-[#800020] shrink-0">
-                            <Package size={12} />
+                            <Package size={12} className="shrink-0" />
                           </div>
                           <div className="overflow-hidden">
                             <p className="font-bold text-slate-800 uppercase text-[10px] sm:text-[11px] truncate">{item.productName}</p>

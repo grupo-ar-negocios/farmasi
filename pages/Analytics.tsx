@@ -289,7 +289,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
           onClick={() => applyQuickFilter('negative_profit')}
           className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${quickFilter === 'negative_profit' ? 'bg-rose-500 text-white shadow-md' : 'bg-white text-rose-500 border border-rose-100 hover:bg-rose-50'}`}
         >
-          <TrendingDown size={16} /> Prejuízo
+          <TrendingDown size={16} className="shrink-0" /> Prejuízo
         </button>
       </div>
 
@@ -357,7 +357,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <DollarSign size={64} />
+            <DollarSign size={64} className="shrink-0" />
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Faturamento Total</p>
           <p className="text-2xl font-black text-slate-800 relative z-10">{formatCurrency(summary.revenue)}</p>
@@ -367,7 +367,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
           <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity ${
              summary.profit > 0 ? 'text-emerald-500' : summary.profit < 0 ? 'text-rose-500' : 'text-slate-500'
           }`}>
-            {summary.profit >= 0 ? <TrendingUp size={64} /> : <TrendingDown size={64} />}
+            {summary.profit >= 0 ? <TrendingUp size={64} className="shrink-0" /> : <TrendingDown size={64} className="shrink-0" />}
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Lucro Líquido</p>
           <p className={`text-2xl font-black relative z-10 ${
@@ -377,7 +377,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
 
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <PieChart size={64} />
+            <PieChart size={64} className="shrink-0" />
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Margem %</p>
           <p className="text-2xl font-black text-slate-800 relative z-10">
@@ -387,7 +387,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
         
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <User size={64} />
+            <User size={64} className="shrink-0" />
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Comissões Pagas</p>
           <p className="text-2xl font-black text-slate-800 relative z-10">{formatCurrency(summary.commission)}</p>
@@ -395,7 +395,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
 
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <Package size={64} />
+            <Package size={64} className="shrink-0" />
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Produtos Vendidos</p>
           <p className="text-2xl font-black text-slate-800 relative z-10">{summary.quantity} unid.</p>
@@ -407,8 +407,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
         {/* Champion Product */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
-            <div className="bg-amber-100 text-amber-600 p-3 rounded-2xl">
-              <TrendingUp size={24} />
+            <div className="bg-amber-100 text-amber-600 p-3 rounded-2xl shrink-0">
+              <TrendingUp size={24} className="shrink-0" />
             </div>
             <div>
               <h3 className="text-lg font-black text-slate-800">Produtos Campeões</h3>
@@ -449,8 +449,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
         {/* Losses and Gifts */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
-            <div className="bg-rose-100 text-rose-600 p-3 rounded-2xl">
-              <TrendingDown size={24} />
+            <div className="bg-rose-100 text-rose-600 p-3 rounded-2xl shrink-0">
+              <TrendingDown size={24} className="shrink-0" />
             </div>
             <div>
               <h3 className="text-lg font-black text-slate-800">Prejuízos & Brindes</h3>
@@ -493,7 +493,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ sales, products, clients, 
       {chartData.length > 0 && (
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
           <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
-            <BarChart2 className="text-[#3b82f6]" size={20} />
+            <BarChart2 className="text-[#3b82f6] shrink-0" size={20} />
             Evolução de Vendas e Lucro
           </h3>
           <div className="h-[300px] w-full">

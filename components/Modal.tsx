@@ -16,6 +16,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity"
+        style={{ WebkitBackdropFilter: 'blur(4px)' }}
         onClick={onClose}
       />
 
@@ -27,7 +28,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             onClick={onClose}
             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 sm:w-6 sm:h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
           </button>
         </div>
         <div className="p-5 sm:p-6 overflow-y-auto custom-scrollbar flex-1">

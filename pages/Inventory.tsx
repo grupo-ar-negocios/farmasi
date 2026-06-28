@@ -24,6 +24,11 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
   const [replenishQty, setReplenishQty] = useState(0);
   const [replenishCost, setReplenishCost] = useState(0);
 
+  // WebKit Decimal Compatibility States
+  const [costPriceStr, setCostPriceStr] = useState('');
+  const [sellPriceStr, setSellPriceStr] = useState('');
+  const [replenishCostStr, setReplenishCostStr] = useState('');
+
   useEffect(() => {
     if (startOpen) openModal();
   }, [startOpen]);
@@ -56,9 +61,13 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
     if (product) {
       setEditingProduct(product);
       setFormData(product);
+      setCostPriceStr(String(product.costPrice).replace('.', ','));
+      setSellPriceStr(String(product.sellPrice).replace('.', ','));
     } else {
       setEditingProduct(null);
       setFormData({ code: '', name: '', costPrice: 0, sellPrice: 0, stockQuantity: 0, consignedQuantity: 0 });
+      setCostPriceStr('');
+      setSellPriceStr('');
     }
     setIsModalOpen(true);
   };
@@ -72,6 +81,7 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
     setReplenishProduct(product);
     setReplenishQty(1);
     setReplenishCost(product.costPrice);
+    setReplenishCostStr(String(product.costPrice).replace('.', ','));
     setIsReplenishOpen(true);
   };
 
@@ -131,15 +141,15 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <Package className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Estoque
+          <Package className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Estoque
         </h2>
         <button onClick={() => openModal()} className="bg-[#800020] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black uppercase text-[9px] sm:text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all w-full sm:w-auto">
-          <Plus size={18} /> Novo Produto
+          <Plus size={18} className="shrink-0" /> Novo Produto
         </button>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+        <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" />
         <input
           type="text"
           placeholder="PESQUISAR CÓDIGO OU NOME..."
@@ -219,9 +229,9 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-slate-950 text-xs sm:text-sm whitespace-nowrap">R$ {product.sellPrice.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
                     <div className="flex justify-center gap-1 sm:gap-3 opacity-100 sm:opacity-20 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openReplenishModal(product)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Repor Estoque"><Package size={16} /></button>
-                      <button onClick={() => openModal(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar"><Edit2 size={16} /></button>
-                      <button onClick={() => { if (confirm(`Excluir permanentemente "${product.name}"?`)) onDelete(product.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors" title="Excluir"><Trash2 size={16} /></button>
+                      <button onClick={() => openReplenishModal(product)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Repor Estoque"><Package size={16} className="shrink-0" /></button>
+                      <button onClick={() => openModal(product)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar"><Edit2 size={16} className="shrink-0" /></button>
+                      <button onClick={() => { if (confirm(`Excluir permanentemente "${product.name}"?`)) onDelete(product.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors" title="Excluir"><Trash2 size={16} className="shrink-0" /></button>
                     </div>
                   </td>
                 </tr>
@@ -244,11 +254,41 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Custo Unitário (R$)</label>
-              <input type="number" step="0.01" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.costPrice} onChange={e => setFormData({ ...formData, costPrice: Number(e.target.value) })} />
+              <input 
+                type="text" 
+                inputMode="decimal"
+                required 
+                className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
+                value={costPriceStr} 
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+                    setCostPriceStr(val);
+                    const normalized = val.replace(',', '.');
+                    const num = parseFloat(normalized);
+                    setFormData(prev => ({ ...prev, costPrice: isNaN(num) ? 0 : num }));
+                  }
+                }} 
+              />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Venda Sugerida (R$)</label>
-              <input type="number" step="0.01" required className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" value={formData.sellPrice} onChange={e => setFormData({ ...formData, sellPrice: Number(e.target.value) })} />
+              <input 
+                type="text" 
+                inputMode="decimal"
+                required 
+                className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
+                value={sellPriceStr} 
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+                    setSellPriceStr(val);
+                    const normalized = val.replace(',', '.');
+                    const num = parseFloat(normalized);
+                    setFormData(prev => ({ ...prev, sellPrice: isNaN(num) ? 0 : num }));
+                  }
+                }} 
+              />
             </div>
           </div>
           <div>
@@ -298,13 +338,20 @@ export const Inventory: React.FC<InventoryProps> = ({ products, onAdd, onEdit, o
           <div>
             <label className="block text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-widest">Novo Custo Unitário de Compra (R$)</label>
             <input 
-              type="number" 
-              step="0.01" 
+              type="text" 
+              inputMode="decimal"
               required 
-              min="0"
               className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all" 
-              value={replenishCost} 
-              onChange={e => setReplenishCost(Number(e.target.value))} 
+              value={replenishCostStr} 
+              onChange={e => {
+                const val = e.target.value;
+                if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+                  setReplenishCostStr(val);
+                  const normalized = val.replace(',', '.');
+                  const num = parseFloat(normalized);
+                  setReplenishCost(isNaN(num) ? 0 : num);
+                }
+              }} 
             />
           </div>
 

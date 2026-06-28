@@ -29,8 +29,8 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, su
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">{title}</p>
           <h3 className="text-2xl font-black text-slate-950">{value}</h3>
         </div>
-        <div className={`p-3 rounded-xl ${iconColors[color]}`}>
-          <Icon size={24} />
+        <div className={`p-3 rounded-xl ${iconColors[color]} shrink-0`}>
+          <Icon size={24} className="shrink-0" />
         </div>
       </div>
       {subtext && <p className="mt-4 text-xs font-semibold text-slate-400">{subtext}</p>}

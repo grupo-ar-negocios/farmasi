@@ -31,6 +31,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [itemQuantity, setItemQuantity] = useState(1);
   const [itemPrice, setItemPrice] = useState(0);
+  const [itemPriceStr, setItemPriceStr] = useState('');
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
@@ -46,6 +47,8 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
     setOriginSalonId('');
     setProductSearch('');
     setSelectedProduct(null);
+    setItemPrice(0);
+    setItemPriceStr('');
     setIsModalOpen(true);
   };
 
@@ -86,6 +89,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
   const handleSelectProduct = (p: Product) => {
     setSelectedProduct(p);
     setItemPrice(p.sellPrice);
+    setItemPriceStr(String(p.sellPrice).replace('.', ','));
     setProductSearch('');
     setShowResults(false);
   };
@@ -161,10 +165,10 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <ShoppingCart className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Vendas
+          <ShoppingCart className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Vendas
         </h2>
         <button onClick={() => openModal()} className="bg-[#800020] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black uppercase text-[9px] sm:text-[10px] tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-red-900/10 hover:bg-[#600018] transition-all active:scale-95 w-full sm:w-auto">
-          <Plus size={18} /> Nova Venda
+          <Plus size={18} className="shrink-0" /> Nova Venda
         </button>
       </div>
 
@@ -215,7 +219,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-right font-bold text-[13px] sm:text-sm text-emerald-600 whitespace-nowrap">R$ {profit.toFixed(2)}</td>
                   <td className="px-5 sm:px-8 py-4 sm:py-6 text-center">
                     <div className="flex justify-center gap-1 sm:gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => { if (confirm("Confirmar exclusão desta venda?")) onDelete(sale.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                      <button onClick={() => { if (confirm("Confirmar exclusão desta venda?")) onDelete(sale.id); }} className="p-2 text-[#800020] hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} className="shrink-0" /></button>
                     </div>
                   </td>
                 </tr>
@@ -269,7 +273,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
               {selectedProduct ? (
                 <div className="flex flex-col sm:flex-row items-center justify-between bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm animate-in zoom-in duration-300 gap-4">
                   <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                    <CheckCircle2 className="text-[#D4AF37] w-5 h-5 sm:w-6 sm:h-6" />
+                    <CheckCircle2 className="text-[#D4AF37] w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
                     <div>
                       <p className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Confirmar Item</p>
                       <p className="text-[12px] sm:text-sm font-bold text-slate-900 uppercase tracking-tight line-clamp-1">{selectedProduct.name}</p>
@@ -280,7 +284,21 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                       <span className="text-[8px] font-bold text-slate-400 uppercase mb-1">Preço</span>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">R$</span>
-                        <input type="number" step="0.01" className="w-20 sm:w-24 pl-7 pr-2 py-2 bg-slate-50 border border-slate-100 rounded-lg text-left font-bold text-sm outline-none focus:border-[#800020]/20" value={itemPrice} onChange={e => setItemPrice(Number(e.target.value))} />
+                        <input 
+                          type="text" 
+                          inputMode="decimal"
+                          className="w-20 sm:w-24 pl-7 pr-2 py-2 bg-slate-50 border border-slate-100 rounded-lg text-left font-bold text-sm outline-none focus:border-[#800020]/20" 
+                          value={itemPriceStr} 
+                          onChange={e => {
+                            const val = e.target.value;
+                            if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+                              setItemPriceStr(val);
+                              const normalized = val.replace(',', '.');
+                              const num = parseFloat(normalized);
+                              setItemPrice(isNaN(num) ? 0 : num);
+                            }
+                          }} 
+                        />
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
@@ -290,13 +308,13 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                     <div className="flex items-end self-end sm:self-center">
                       <button type="button" onClick={addItem} className="bg-[#800020] text-white px-5 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md shadow-red-900/10 flex-1 sm:flex-none">Adicionar</button>
                     </div>
-                    <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] transition-colors p-1 self-center"><X size={20} /></button>
+                    <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] transition-colors p-1 self-center"><X size={20} className="shrink-0" /></button>
                   </div>
                 </div>
               ) : (
                 <div className="relative">
                   <div className="relative">
-                    <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-[16px] sm:h-[16px]" />
+                    <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" />
                     <input
                       type="text"
                       placeholder="BUSCAR NO CATÁLOGO..."
@@ -356,7 +374,7 @@ export const Sales: React.FC<SalesProps> = ({ sales, products, clients, salons, 
                   </div>
                   <div className="flex items-center gap-3 sm:gap-6 shrink-0">
                     <span className="font-bold text-xs sm:text-sm text-slate-900 tracking-tighter">R$ {(item.unitPrice * item.quantity).toFixed(2)}</span>
-                    <button type="button" onClick={() => removeItem(idx)} className="text-slate-300 hover:text-[#800020] transition-all hover:scale-110 p-1"><Trash2 size={16} /></button>
+                    <button type="button" onClick={() => removeItem(idx)} className="text-slate-300 hover:text-[#800020] transition-all hover:scale-110 p-1"><Trash2 size={16} className="shrink-0" /></button>
                   </div>
                 </div>
               ))}

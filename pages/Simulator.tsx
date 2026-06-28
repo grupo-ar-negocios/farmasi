@@ -24,6 +24,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
   const [customPrice, setCustomPrice] = useState<number | ''>('');
+  const [customPriceStr, setCustomPriceStr] = useState('');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,9 +68,11 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
   React.useEffect(() => {
     if (selectedProduct) {
       setCustomPrice(selectedProduct.sellPrice);
+      setCustomPriceStr(String(selectedProduct.sellPrice).replace('.', ','));
       setQuantity(1);
     } else {
       setCustomPrice('');
+      setCustomPriceStr('');
       setQuantity(1);
     }
   }, [selectedProductId, selectedProduct]);
@@ -93,6 +96,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
     setSelectedProductId('');
     setSearchTerm('');
     setCustomPrice('');
+    setCustomPriceStr('');
     setQuantity(1);
   };
 
@@ -132,7 +136,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <Calculator className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Simulador
+          <Calculator className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Simulador
         </h2>
         <div className="text-xs font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-xl">
           Simule descontos e preços para kits
@@ -145,7 +149,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-              <Plus size={18} className="text-[#800020]" />
+              <Plus size={18} className="text-[#800020] shrink-0" />
               Adicionar Produto
             </h3>
 
@@ -153,7 +157,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
               <div ref={dropdownRef} className="relative">
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Buscar Produto</label>
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 shrink-0" />
                   <input
                     type="text"
                     placeholder="DIGITE O NOME OU CÓDIGO..."
@@ -206,12 +210,20 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Venda Simulada (R$)</label>
                   <input 
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     required
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all"
-                    value={customPrice}
-                    onChange={(e) => setCustomPrice(e.target.value ? Number(e.target.value) : '')}
+                    value={customPriceStr}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+                        setCustomPriceStr(val);
+                        const normalized = val.replace(',', '.');
+                        const num = parseFloat(normalized);
+                        setCustomPrice(isNaN(num) ? '' : num);
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -228,8 +240,8 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
 
           {/* Dica */}
           <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 flex items-start gap-4">
-            <div className="bg-amber-200 text-amber-700 p-2 rounded-xl mt-1">
-              <HelpCircle size={20} />
+            <div className="bg-amber-200 text-amber-700 p-2 rounded-xl mt-1 shrink-0">
+              <HelpCircle size={20} className="shrink-0" />
             </div>
             <div>
               <p className="text-xs font-bold text-amber-900 mb-1">Como usar o Simulador?</p>
@@ -247,7 +259,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Tag size={48} className="text-slate-900" />
+                <Tag size={48} className="text-slate-900 shrink-0" />
               </div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Venda Total</p>
               <p className="text-2xl font-black text-slate-900 relative z-10">{formatCurrency(totals.totalRevenue)}</p>
@@ -255,7 +267,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
             
             <div className="bg-emerald-500 p-5 rounded-3xl shadow-lg shadow-emerald-500/20 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10">
-                <TrendingUp size={48} className="text-white" />
+                <TrendingUp size={48} className="text-white shrink-0" />
               </div>
               <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest mb-1 relative z-10">Lucro Estimado</p>
               <p className="text-2xl font-black text-white relative z-10">{formatProfitCurrency(totals.totalProfit)}</p>
@@ -263,7 +275,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
 
             <div className="bg-[#800020] p-5 rounded-3xl shadow-lg shadow-[#800020]/20 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Calculator size={48} className="text-white" />
+                <Calculator size={48} className="text-white shrink-0" />
               </div>
               <p className="text-[10px] font-bold text-rose-200 uppercase tracking-widest mb-1 relative z-10">Margem Real</p>
               <p className="text-2xl font-black text-white relative z-10">{totals.profitMargin.toFixed(1)}%</p>
@@ -330,7 +342,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
                               className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition-all"
                               title="Remover Item"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={16} className="shrink-0" />
                             </button>
                           </td>
                         </tr>
@@ -342,7 +354,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ products }) => {
             ) : (
               <div className="p-12 text-center">
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Package size={24} className="text-slate-300" />
+                  <Package size={24} className="text-slate-300 shrink-0" />
                 </div>
                 <h4 className="text-sm font-bold text-slate-900 mb-1">Nenhum produto adicionado</h4>
                 <p className="text-xs text-slate-500">Selecione um produto ao lado para começar sua simulação.</p>

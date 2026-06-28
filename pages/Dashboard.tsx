@@ -134,8 +134,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
   const QuickActionButton = ({ icon: Icon, label, onClick, bgColor, iconColor }: any) => (
     <button onClick={onClick} className="flex flex-col items-center justify-center p-3 sm:p-6 rounded-2xl sm:rounded-[2rem] transition-all hover:scale-105 active:scale-95 shadow-sm border border-slate-100 bg-white group hover:border-[#800020]/20">
-      <div className={`${bgColor} p-3 sm:p-5 rounded-2xl mb-2 sm:mb-3 shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] transition-transform group-hover:scale-110`}>
-        <Icon className={`${iconColor} w-5 h-5 sm:w-7 sm:h-7`} />
+      <div className={`${bgColor} p-3 sm:p-5 rounded-2xl mb-2 sm:mb-3 shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] transition-transform group-hover:scale-110 shrink-0`}>
+        <Icon className={`${iconColor} w-5 h-5 sm:w-7 sm:h-7 shrink-0`} />
       </div>
       <span className="font-bold text-[8px] sm:text-[10px] text-slate-800 uppercase tracking-wider sm:tracking-widest text-center">{label}</span>
     </button>
@@ -148,7 +148,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
       {isImporting && (
         <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-white">
           <div className="w-full max-w-md space-y-8 text-center animate-in zoom-in duration-300">
-            <Loader2 size={64} className="mx-auto text-[#D4AF37] animate-spin mb-4" />
+            <Loader2 size={64} className="mx-auto text-[#D4AF37] animate-spin mb-4 shrink-0" />
             <h2 className="text-3xl font-black uppercase tracking-tighter">Processando Planilha</h2>
             <p className="text-slate-400 font-bold uppercase text-[9px] tracking-[0.4em]">Sincronizando dados com o sistema FLUXO BEAUTY...</p>
 
@@ -166,9 +166,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
       {/* Toast de Feedback */}
       {feedback && (
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-[110] flex items-center gap-4 px-8 py-4 rounded-2xl shadow-2xl border-2 animate-in slide-in-from-top-10 duration-500 ${feedback.type === 'success' ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-rose-50 border-rose-500 text-rose-900'}`}>
-          {feedback.type === 'success' ? <CheckCircle2 className="text-emerald-500" /> : <AlertCircle className="text-rose-500" />}
+          {feedback.type === 'success' ? <CheckCircle2 className="text-emerald-500 shrink-0" /> : <AlertCircle className="text-rose-500 shrink-0" />}
           <span className="font-black uppercase text-[11px] tracking-wider">{feedback.message}</span>
-          <button onClick={() => setFeedback(null)} className="ml-4 opacity-50 hover:opacity-100"><Activity size={16} /></button>
+          <button onClick={() => setFeedback(null)} className="ml-4 opacity-50 hover:opacity-100"><Activity size={16} className="shrink-0" /></button>
         </div>
       )}
 
@@ -178,7 +178,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
             FLUXO BEAUTY <span className="text-[#800020] italic block lg:mt-2 text-xl md:text-4xl">Sistema de Gestão</span>
           </h2>
           <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.5em] mt-4 lg:mt-6 flex items-center gap-3">
-            <Activity size={12} className="text-[#D4AF37]" /> Excelência em Gestão
+            <Activity size={12} className="text-[#D4AF37] shrink-0" /> Excelência em Gestão
           </p>
         </div>
 
@@ -190,14 +190,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center justify-center gap-3 bg-white text-slate-950 border-2 border-slate-950 px-6 py-4 rounded-2xl hover:bg-slate-50 transition-all text-[10px] sm:text-[11px] font-black uppercase tracking-widest disabled:opacity-50 w-full sm:w-auto"
             >
-              <Upload size={18} /> Importar Estoque
+              <Upload size={18} className="shrink-0" /> Importar Estoque
             </button>
             <button onClick={() => storage.exportToExcel(products)} className="flex items-center justify-center gap-3 bg-slate-950 text-white px-8 py-4 rounded-2xl hover:bg-black transition-all text-[10px] sm:text-[11px] font-black uppercase tracking-widest shadow-xl w-full sm:w-auto">
-              <Download size={18} /> Backup
+              <Download size={18} className="shrink-0" /> Backup
             </button>
           </div>
           <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase flex items-center gap-2 mt-1">
-            <Info size={12} className="text-blue-400" /> Colunas: Código | Nome | Custo | Venda | Estoque
+            <Info size={12} className="text-blue-400 shrink-0" /> Colunas: Código | Nome | Custo | Venda | Estoque
           </p>
         </div>
       </div>
@@ -253,8 +253,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
 
         <div className="lg:col-span-5 bg-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col h-full">
           <div className="flex items-center gap-4 mb-8 sm:mb-10">
-            <div className="p-3 sm:p-4 bg-slate-50 text-[#D4AF37] rounded-2xl border border-slate-100">
-              <History className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="p-3 sm:p-4 bg-slate-50 text-[#D4AF37] rounded-2xl border border-slate-100 shrink-0">
+              <History className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
             </div>
             <div>
               <h3 className="text-[9px] sm:text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Últimas Vendas</h3>
@@ -266,8 +266,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ sales, products, consignme
             {sales.slice(0, 8).map(sale => (
               <div key={sale.id} className="flex items-center justify-between p-4 sm:p-5 bg-slate-50/50 rounded-2xl border border-slate-100/50 hover:border-[#800020]/20 transition-all group">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className={`p-2.5 sm:p-3 rounded-xl transition-colors ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'}`}>
-                    <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                  <div className={`p-2.5 sm:p-3 rounded-xl transition-colors ${sale.type === 'direct' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'} shrink-0`}>
+                    <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                   </div>
                   <div>
                     <p className="text-[10px] sm:text-[11px] font-bold text-slate-800 uppercase">{sale.items.length} {sale.items.length === 1 ? 'item' : 'itens'}</p>

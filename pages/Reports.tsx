@@ -144,7 +144,7 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
         <div>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-950 uppercase tracking-tighter">Relatórios <span className="text-[#800020] italic">Estratégicos</span></h2>
           <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] sm:tracking-[0.4em] mt-2 flex items-center gap-2">
-            <Target size={14} className="text-[#800020]" /> Inteligência FLUXO BEAUTY
+            <Target size={14} className="text-[#800020] shrink-0" /> Inteligência FLUXO BEAUTY
           </p>
         </div>
         <div className="bg-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-[#800020]/10 flex items-center gap-3">
@@ -225,7 +225,7 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <PieChartIcon className="text-slate-100" size={24} />
+              <PieChartIcon className="text-slate-100 shrink-0" size={24} />
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full mt-4 sm:mt-6">
@@ -244,7 +244,7 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
         {/* Top Products */}
         <div className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm">
           <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-            <div className="p-3 sm:p-4 bg-emerald-50 text-emerald-500 rounded-xl sm:rounded-2xl shrink-0"><Award size={24} /></div>
+            <div className="p-3 sm:p-4 bg-emerald-50 text-emerald-500 rounded-xl sm:rounded-2xl shrink-0"><Award size={24} className="shrink-0" /></div>
             <div>
               <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Top 5 Produtos</h3>
               <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Volume de Vendas</p>
@@ -262,7 +262,7 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-[12px] sm:text-sm font-black text-slate-950">R$ {p.revenue.toLocaleString()}</p>
-                  <ArrowUpRight size={14} className="text-emerald-500 ml-auto" />
+                  <ArrowUpRight size={14} className="text-emerald-500 ml-auto shrink-0" />
                 </div>
               </div>
             ))}
@@ -272,7 +272,7 @@ export const Reports: React.FC<ReportsProps> = ({ sales, products, salons }) => 
         {/* Salon Performance */}
         <div className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border border-slate-50 shadow-sm">
           <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-            <div className="p-3 sm:p-4 bg-blue-50 text-blue-500 rounded-xl sm:rounded-2xl shrink-0"><BarChart3 size={24} /></div>
+            <div className="p-3 sm:p-4 bg-blue-50 text-blue-500 rounded-xl sm:rounded-2xl shrink-0"><BarChart3 size={24} className="shrink-0" /></div>
             <div>
               <h3 className="text-[11px] sm:text-xs font-black text-slate-950 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Performance Parceiros</h3>
               <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase">Receita por Salão</p>

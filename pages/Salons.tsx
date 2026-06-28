@@ -22,6 +22,7 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
   const [formData, setFormData] = useState<Partial<Salon>>({});
   const [isExtratoModalOpen, setIsExtratoModalOpen] = useState(false);
   const [selectedSalonId, setSelectedSalonId] = useState<string | null>(null);
+  const [commissionRateStr, setCommissionRateStr] = useState('');
 
   useEffect(() => {
     if (startOpen) handleOpenAdd();
@@ -30,12 +31,14 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
   const handleOpenAdd = () => {
     setEditingSalon(null);
     setFormData({ name: '', contactPerson: '', phone: '', address: '', commissionRate: 0 });
+    setCommissionRateStr('');
     setIsAddModalOpen(true);
   };
 
   const handleOpenEdit = (salon: Salon) => {
     setEditingSalon(salon);
     setFormData(salon);
+    setCommissionRateStr(String(salon.commissionRate).replace('.', ','));
     setIsAddModalOpen(true);
   };
 
@@ -72,10 +75,10 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <Store className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Parceiros
+          <Store className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Parceiros
         </h2>
         <button onClick={handleOpenAdd} className="bg-[#800020] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black uppercase text-[9px] sm:text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-[#600018] shadow-lg shadow-red-900/10 transition-all active:scale-95 w-full sm:w-auto">
-          <Plus size={18} /> Novo Cadastro
+          <Plus size={18} className="shrink-0" /> Novo Cadastro
         </button>
       </div>
 
@@ -106,8 +109,8 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
           return (
             <div key={salon.id} className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all flex flex-col group relative overflow-hidden">
               <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-2 sm:gap-3 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all">
-                <button onClick={() => handleOpenEdit(salon)} className="p-2 sm:p-3 text-blue-600 bg-blue-50/50 rounded-xl sm:rounded-2xl hover:bg-blue-50 transition-colors"><Edit2 size={18} /></button>
-                <button onClick={() => { if (confirm(`Excluir permanentemente o salão "${salon.name}"?`)) onDelete(salon.id); }} className="p-2 sm:p-3 text-[#800020] bg-red-50/50 rounded-xl sm:rounded-2xl hover:bg-red-50 transition-colors"><Trash2 size={18} /></button>
+                <button onClick={() => handleOpenEdit(salon)} className="p-2 sm:p-3 text-blue-600 bg-blue-50/50 rounded-xl sm:rounded-2xl hover:bg-blue-50 transition-colors"><Edit2 size={18} className="shrink-0" /></button>
+                <button onClick={() => { if (confirm(`Excluir permanentemente o salão "${salon.name}"?`)) onDelete(salon.id); }} className="p-2 sm:p-3 text-[#800020] bg-red-50/50 rounded-xl sm:rounded-2xl hover:bg-red-50 transition-colors"><Trash2 size={18} className="shrink-0" /></button>
               </div>
 
               <div className="mb-5">
@@ -152,7 +155,7 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
                   <span className="text-[8px] sm:text-[9px] font-bold text-[#800020] bg-white border border-red-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full tracking-tighter shrink-0">{salon.commissionRate}%</span>
                 </div>
                 <button onClick={() => handleOpenExtrato(salon.id)} disabled={commissionValue <= 0} className={`w-full py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all relative z-10 ${commissionValue > 0 ? 'bg-[#800020] text-white hover:bg-[#600018] shadow-md shadow-red-900/5' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
-                  <FileText size={16} /> Extrato
+                  <FileText size={16} className="shrink-0" /> Extrato
                 </button>
               </div>
             </div>
@@ -177,7 +180,21 @@ export const Salons: React.FC<SalonsProps> = ({ salons, sales, consignments, pro
             </div>
             <div>
               <label className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase mb-2 sm:mb-3 block tracking-widest">Comissão (%)</label>
-              <input type="number" className="w-full p-4 sm:p-5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl text-slate-900 font-bold text-[10px] sm:text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all shadow-sm" value={formData.commissionRate || ''} onChange={e => setFormData({ ...formData, commissionRate: Number(e.target.value) })} />
+              <input 
+                type="text" 
+                inputMode="decimal"
+                className="w-full p-4 sm:p-5 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl text-slate-900 font-bold text-[10px] sm:text-[11px] focus:bg-white focus:border-[#800020]/30 outline-none transition-all shadow-sm" 
+                value={commissionRateStr} 
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+                    setCommissionRateStr(val);
+                    const normalized = val.replace(',', '.');
+                    const num = parseFloat(normalized);
+                    setFormData(prev => ({ ...prev, commissionRate: isNaN(num) ? 0 : num }));
+                  }
+                }} 
+              />
             </div>
           </div>
           <div>

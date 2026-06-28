@@ -23,6 +23,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
   const [hasGenerated, setHasGenerated] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [copied, setCopied] = useState(false);
+  const [promoPricesStr, setPromoPricesStr] = useState<Record<string, string>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Analysis function to select recommendations
@@ -188,7 +189,41 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
     }
 
     setSuggestions(list);
+    const initialPricesStr: Record<string, string> = {};
+    list.forEach(item => {
+      initialPricesStr[item.productId] = String(item.promoPrice).replace('.', ',');
+    });
+    setPromoPricesStr(initialPricesStr);
     setHasGenerated(true);
+  };
+
+  const handlePromoPriceInputChange = (index: number, productId: string, val: string) => {
+    if (val === '' || /^[0-9]+[.,]?[0-9]*$/.test(val) || val === ',' || val === '.') {
+      setPromoPricesStr(prev => ({ ...prev, [productId]: val }));
+      const normalized = val.replace(',', '.');
+      const num = parseFloat(normalized);
+      if (!isNaN(num)) {
+        const updated = [...suggestions];
+        updated[index].promoPrice = num;
+        setSuggestions(updated);
+      }
+    }
+  };
+
+  const handlePromoPriceBlur = (index: number, productId: string) => {
+    const item = suggestions[index];
+    const originalProd = products.find(p => p.id === item.productId);
+    if (originalProd) {
+      const minPrice = originalProd.costPrice;
+      if (item.promoPrice < minPrice) {
+        alert(`O valor promocional não pode ser menor que o preço de custo (R$ ${minPrice.toFixed(2)})!`);
+        const resetVal = Math.max(item.originalPrice * 0.9, minPrice);
+        const updated = [...suggestions];
+        updated[index].promoPrice = resetVal;
+        setSuggestions(updated);
+        setPromoPricesStr(prev => ({ ...prev, [productId]: String(resetVal).replace('.', ',') }));
+      }
+    }
   };
 
   const handleUpdatePrice = (index: number, val: number) => {
@@ -770,7 +805,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <Sparkles className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Vitrine Express
+          <Sparkles className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Vitrine Express
         </h2>
       </div>
 
@@ -778,7 +813,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
         /* Tela Inicial / Chamada de ação */
         <div className="bg-white rounded-3xl sm:rounded-[2.5rem] border border-slate-50 shadow-sm p-6 sm:p-12 text-center max-w-2xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500">
           <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
-            <Zap className="text-[#800020] w-10 h-10 sm:w-12 sm:h-12 animate-pulse" />
+            <Zap className="text-[#800020] w-10 h-10 sm:w-12 sm:h-12 animate-pulse shrink-0" />
           </div>
           <div className="space-y-2 sm:space-y-3">
             <h3 className="text-xl sm:text-2xl font-black uppercase text-slate-900 tracking-tight">O que é o Catálogo Relâmpago?</h3>
@@ -822,7 +857,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
             onClick={generateSuggestions}
             className="bg-[#800020] text-white px-8 sm:px-12 py-4 sm:py-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs tracking-widest flex items-center justify-center gap-2 mx-auto shadow-xl shadow-red-900/25 hover:bg-[#600018] hover:-translate-y-0.5 transition-all active:scale-95"
           >
-            <Zap size={16} /> Gerar Catálogo de Hoje
+            <Zap size={16} className="shrink-0" /> Gerar Catálogo de Hoje
           </button>
         </div>
       ) : (
@@ -842,13 +877,13 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
                   className="p-3 text-slate-400 hover:text-[#800020] bg-slate-50 rounded-xl hover:bg-rose-50 transition-colors"
                   title="Recalcular Ofertas"
                 >
-                  <RefreshCw size={16} />
+                  <RefreshCw size={16} className="shrink-0" />
                 </button>
               </div>
 
               {suggestions.length === 0 ? (
                 <div className="py-12 text-center text-slate-400">
-                  <Info className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                  <Info className="w-8 h-8 mx-auto mb-2 text-slate-300 shrink-0" />
                   <p className="text-[10px] font-bold uppercase tracking-widest">Nenhum produto em estoque para recomendar.</p>
                 </div>
               ) : (
@@ -895,10 +930,11 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
                           <div>
                             <span className="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Preço Promo (R$)</span>
                             <input
-                              type="number"
-                              step="0.01"
-                              value={item.promoPrice}
-                              onChange={e => handleUpdatePrice(idx, Number(e.target.value))}
+                              type="text"
+                              inputMode="decimal"
+                              value={promoPricesStr[item.productId] || ''}
+                              onChange={e => handlePromoPriceInputChange(idx, item.productId, e.target.value)}
+                              onBlur={() => handlePromoPriceBlur(idx, item.productId)}
                               className="w-full px-2 py-1 bg-white border border-slate-100 rounded-lg text-slate-950 font-black text-xs outline-none focus:border-[#800020]/30"
                             />
                           </div>
@@ -920,7 +956,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
               <div className="bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-50 shadow-sm space-y-4">
                 <div className="flex justify-between items-center pb-3 border-b border-slate-100">
                   <h3 className="font-black text-slate-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                    <MessageSquare size={16} className="text-[#800020]" /> Texto para WhatsApp
+                    <MessageSquare size={16} className="text-[#800020] shrink-0" /> Texto para WhatsApp
                   </h3>
                   <button
                     onClick={handleCopyText}
@@ -928,7 +964,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
                       copied ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-950 text-white hover:bg-black shadow-md shadow-slate-200'
                     }`}
                   >
-                    {copied ? <Check size={12} /> : <Copy size={12} />}
+                    {copied ? <Check size={12} className="shrink-0" /> : <Copy size={12} className="shrink-0" />}
                     {copied ? 'Copiado!' : 'Copiar Texto'}
                   </button>
                 </div>
@@ -947,7 +983,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
               <div className="w-full flex justify-between items-center pb-4 border-b border-slate-100">
                 <div>
                   <h3 className="font-black text-slate-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                    <Flame size={16} className="text-[#D4AF37]" /> Visual da Imagem (Flyer)
+                    <Flame size={16} className="text-[#D4AF37] shrink-0" /> Visual da Imagem (Flyer)
                   </h3>
                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Gere a imagem para seus Stories ou WhatsApp</p>
                 </div>
@@ -956,7 +992,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
                   onClick={handleDownloadFlyer}
                   className="flex items-center gap-1.5 bg-[#800020] text-white px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-[#600018] shadow-md shadow-red-900/10 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100"
                 >
-                  <Download size={14} /> Salvar Imagem
+                  <Download size={14} className="shrink-0" /> Salvar Imagem
                 </button>
               </div>
 
@@ -977,7 +1013,7 @@ export const VitrineExpress: React.FC<VitrineExpressProps> = ({ products, sales 
                 </div>
               ) : (
                 <div className="w-full max-w-[320px] aspect-[800/1200] bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-8">
-                  <LoaderIcon className="w-8 h-8 animate-spin text-[#800020] mb-2" />
+                  <LoaderIcon className="w-8 h-8 animate-spin text-[#800020] mb-2 shrink-0" />
                   <p className="text-[10px] font-black uppercase tracking-widest text-center leading-relaxed">Carregando panfleto digital...</p>
                 </div>
               )}

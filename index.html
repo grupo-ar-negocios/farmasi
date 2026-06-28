@@ -66,6 +66,44 @@
   .border-brand {
     border-color: var(--brand-primary);
   }
+
+  /* WebKit/Safari Backdrop Blur Compatibility */
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(4px) !important;
+    backdrop-filter: blur(4px) !important;
+  }
+  .backdrop-blur-md {
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+  .backdrop-blur-lg {
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
+  }
+  .backdrop-blur-xl {
+    -webkit-backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(24px) !important;
+  }
+  .backdrop-blur-2xl {
+    -webkit-backdrop-filter: blur(40px) !important;
+    backdrop-filter: blur(40px) !important;
+  }
+
+  /* Smooth momentum scrolling on iOS */
+  .overflow-y-auto, .overflow-x-auto, .custom-scrollbar {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Custom styling for Select elements in iOS Safari to display burgundy arrow */
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23800020' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.25rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem !important;
+  }
 </style>
 <script type="importmap">
 {

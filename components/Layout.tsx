@@ -48,7 +48,7 @@ const NavItem: React.FC<NavItemProps> = ({
         : 'text-slate-500 hover:bg-slate-50 hover:text-[#800020]'
         }`}
     >
-      <Icon size={20} className={isActive ? 'text-[#D4AF37]' : ''} />
+      <Icon size={20} className={`shrink-0 ${isActive ? 'text-[#D4AF37]' : ''}`} />
       <span className={`font-semibold text-sm tracking-tight ${isActive ? 'text-white' : ''}`}>{label}</span>
     </button>
   );
@@ -71,7 +71,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
   ];
 
   return (
-    <div className="flex h-screen bg-[#fffafb] overflow-hidden">
+    <div className="flex h-[100dvh] bg-[#fffafb] overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-100 h-full p-6 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
         <div className="mb-10 flex justify-center">
@@ -93,7 +93,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
             onClick={() => supabase.auth.signOut()}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all duration-200"
           >
-            <LogOut size={20} />
+            <LogOut size={20} className="shrink-0" />
             <span className="font-medium text-sm">Sair do Sistema</span>
           </button>
         </div>
@@ -109,7 +109,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 text-slate-600 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
         >
-          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          {isMobileMenuOpen ? <X size={20} className="shrink-0" /> : <Menu size={20} className="shrink-0" />}
         </button>
       </div>
 
@@ -135,7 +135,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onChangeV
                 onClick={() => supabase.auth.signOut()}
                 className="flex items-center gap-3 w-full px-5 py-4 rounded-2xl text-rose-500 bg-rose-50 font-bold text-sm transition-all"
               >
-                <LogOut size={20} />
+                <LogOut size={20} className="shrink-0" />
                 <span>Sair do Sistema</span>
               </button>
             </div>

@@ -161,11 +161,11 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
     <div className="space-y-6 pb-20 sm:pb-0">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tighter">
-          <Handshake className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8" /> Consignações
+          <Handshake className="text-[#800020] w-7 h-7 sm:w-8 sm:h-8 shrink-0" /> Consignações
         </h2>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <label className="flex items-center gap-3 bg-white border border-slate-100 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-sm text-slate-400 font-bold text-[9px] sm:text-[10px] uppercase tracking-widest w-full sm:w-auto">
-            <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+            <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" />
             <input
               type="text"
               placeholder="Filtro por produto..."
@@ -175,7 +175,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
             />
           </label>
           <button onClick={() => openModal()} className="bg-[#800020] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black uppercase text-[9px] sm:text-[10px] tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-red-900/10 hover:bg-[#600018] transition-all active:scale-95 w-full sm:w-auto">
-            <Plus size={18} /> Novo Envio
+            <Plus size={18} className="shrink-0" /> Novo Envio
           </button>
         </div>
       </div>
@@ -216,13 +216,13 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
                     </td>
                     <td className="px-5 sm:px-8 py-4 sm:py-5 text-center">
                       <span className="inline-flex items-center gap-1.5 sm:gap-2 bg-emerald-50 text-emerald-600 text-[8px] sm:text-[10px] font-black uppercase px-3 sm:px-4 py-1.5 sm:py-2 rounded-full">
-                        <CheckCircle2 size={12} /> Aberto
+                        <CheckCircle2 size={12} className="shrink-0" /> Aberto
                       </span>
                     </td>
                     <td className="px-5 sm:px-8 py-4 sm:py-5 text-center">
                       <div className="flex items-center justify-center gap-1 sm:gap-3 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openModal(c)} className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Edit2 size={14} /></button>
-                        <button onClick={() => { if (confirm("Excluir consignado?")) onDelete(c.id); }} className="p-2 bg-red-50 text-red-600 rounded-lg"><Trash2 size={14} /></button>
+                        <button onClick={() => openModal(c)} className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Edit2 size={14} className="shrink-0" /></button>
+                        <button onClick={() => { if (confirm("Excluir consignado?")) onDelete(c.id); }} className="p-2 bg-red-50 text-red-600 rounded-lg"><Trash2 size={14} className="shrink-0" /></button>
                       </div>
                     </td>
                   </tr>
@@ -288,13 +288,13 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
                         <input type="number" min="1" className="w-14 sm:w-16 p-2 bg-slate-50 border border-slate-100 rounded-lg text-center font-bold text-sm outline-none focus:border-[#800020]/20" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
                       </div>
                       <button type="button" onClick={addItem} className="bg-[#800020] text-white px-4 sm:px-6 py-2 rounded-lg font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-[#600018] transition-all shadow-md">Adicionar</button>
-                      <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] p-1"><X size={20} /></button>
+                      <button type="button" onClick={() => setSelectedProduct(null)} className="text-slate-300 hover:text-[#800020] p-1"><X size={20} className="shrink-0" /></button>
                     </div>
                   </div>
                 ) : (
                   <div className="relative">
                     <div className="relative">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 shrink-0" />
                       <input
                         type="text"
                         placeholder="BUSCAR PRODUTO..."
@@ -342,7 +342,7 @@ export const Consignments: React.FC<ConsignmentsProps> = ({ consignments, salons
                       <div className="bg-slate-50 px-2 py-1 rounded text-slate-900 font-bold text-[10px] border border-slate-100 shrink-0">{item.quantity}x</div>
                       <span className="font-bold text-[11px] sm:text-xs uppercase text-slate-800 tracking-tight truncate">{item.productName}</span>
                     </div>
-                    <button type="button" onClick={() => removeItem(idx)} className="text-slate-300 hover:text-[#800020] transition-all hover:scale-110 p-1"><Trash2 size={16} /></button>
+                    <button type="button" onClick={() => removeItem(idx)} className="text-slate-300 hover:text-[#800020] transition-all hover:scale-110 p-1"><Trash2 size={16} className="shrink-0" /></button>
                   </div>
                 ))}
               </div>
